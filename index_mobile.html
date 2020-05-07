@@ -1,0 +1,313 @@
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+	<script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
+	<!-- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css" />
+	<script src="https://unpkg.com/leaflet@1.3.3/dist/leaflet.js"></script>
+	<script src='https://unpkg.com/leaflet.mapkitmutant@latest/Leaflet.MapkitMutant.js'></script> -->
+	<script src="main.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<style>
+	html,
+body {
+	margin-top: 0px;
+}
+
+/*>>> HEADLINE CARD */
+.headline-card {
+	transition: box-shadow 0.15s ease-in-out;
+	/*background-color: rgba(243, 165, 115, 0.1)*/
+	cursor: pointer;
+}
+
+.headline-card.showing {
+	cursor: default;
+}
+
+.headline-card:hover {
+	box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .17) !important;
+	transition: box-shadow 0.15s ease-in-out;
+}
+
+.headline-card.focus {
+	/*box-shadow: 0 .5rem 1rem rgb(243, 165, 115, 0.2) !important;*/
+	box-shadow: 0px 0px 20px 0px rgba(243, 165, 115, 0.50) !important;
+}
+
+.headline-card-body {
+	display: flex;
+	flex-direction: column;
+}
+
+.headline-info {
+	display: flex;
+	flex-direction: row;
+	font-size: 8pt;
+	margin-top: 5px;
+	padding-top: 5px;
+	border-top: 1px solid lightgray;
+}
+
+.headline-content {
+	max-height: 0px;
+	margin-top: 5px;
+	transition: max-height 0.5s ease-in-out;
+}
+
+.headline.showing .headline-content {
+	max-height: 1000px;
+	padding-bottom: 5px;
+	font-size: 10pt;
+	transition: max-height 0.5s ease-in-out;
+}
+
+.headline-card.focus .headline-info {
+	border-top: 1px solid #f4a56d;
+}
+
+.headline-title {
+	font-weight: 500;
+}
+
+.headline-date {}
+
+.headline-badge {
+	margin-right: 5px;
+	font-size: 8pt;
+}
+
+.headline-source {
+	flex: 1;
+}
+
+
+/*>>> DROPDOWN STYLING*/
+.dropdown {
+	background-color: #f4a56d !important;
+	border-color: #f4a56d !important;
+}
+
+.dropdown:hover,
+.dropdown:active,
+.dropdown:visited,
+.dropdown:focus {
+	background-color: rgb(233, 155, 105) !important;
+	border-color: rgb(233, 155, 105) !important;
+}
+
+.dropdown:hover .dropdown-menu {
+	display: block;
+}
+
+.dropdown-menu {
+	margin-top: 0px;
+	padding: 0px;
+	width: 250px;
+}
+
+.dropdown-item.selected {
+	background-color: lightgray;
+}
+
+.dropdown-item {
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+/*-------------------------------------------------*/
+/*SPECIFIC TO MOBILE*/
+/*-------------------------------------------------*/
+body {}
+
+.headline {
+	scroll-snap-align: start;
+	display: inline-block;
+	width: 100%;
+	white-space: initial;
+	vertical-align: bottom;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	padding-bottom: 0.5em;
+}
+
+.headline:last-child {
+	/*padding-right: 7.5%;*/
+}
+
+.headline:first-child {
+	/*padding-left: 7.5%;	*/
+}
+
+#headlines {
+	overflow-x: scroll;
+	overflow-y: hidden;
+	white-space: nowrap;
+	scroll-snap-type: x mandatory;
+}
+
+#scrolling-wrapper {
+	overflow-x: scroll;
+	overflow-y: scroll;
+	scroll-snap-type: y mandatory;
+
+	height: 100vh;
+	width: 100vw;
+}
+
+#top-part,
+#bottom-part {
+	height: 100vh;
+	scroll-snap-align: start;
+}
+
+#headlines_container {
+	position: absolute;
+	bottom: 0;
+	width: 100vw;
+}
+
+#map {
+	width: 100vw;
+	height: 100vh;
+}
+
+/*To use position absolute in a relativ context*/
+.rel-wrapper {
+	position: relative;
+}
+
+#bottom-part {
+	padding: 0.5em;
+	display: flex;
+	flex-direction: column;
+}
+
+#searchbar {
+	height: 2em;
+}
+#source-selector {
+	display: flex;
+	flex-direction: column;
+}
+#source-selector > button {
+	margin-bottom: 0.5em;
+}
+#source-selector > button.selected {
+	background-color: gray;
+	color: white;
+}
+
+</style>
+
+<body onload="init()">
+	<div id="scrolling-wrapper">
+		<div id="top-part">
+			<div class="rel-wrapper">
+				<div id="map"></div>
+				<div id="headlines_container">
+					<div id="headlines">
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="bottom-part">
+			<div id="top-bar-searchbar" class="input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text" id="basic-addon1">
+						<i class="fas fa-search"></i>
+					</span>
+				</div>
+				<input id="search" type="text" class="form-control" placeholder="Search regex" aria-label="Search" aria-describedby="basic-addon1" oninput="search(this)">
+			</div>
+			<div id="source-selector">
+				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_bbc" onclick="toggle_provider(this)">BBC</button>
+				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_nyt" onclick="toggle_provider(this)">The New York Times</button>
+				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_tg" onclick="toggle_provider(this)">The Guardian</button>
+				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_r" onclick="toggle_provider(this)">Reuters</button>
+				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_lat" onclick="toggle_provider(this)">Los Angeles Times</button>
+			</div>
+		</div>
+	</div>
+	<!-- 		<div id="container">
+		<div id="top-part">
+			Hello!
+			<div id="map"></div>
+			<div id="headlines_container">
+				<div id="headlines">
+				</div>
+			</div>
+		</div>
+		<div id="bottom-part">
+			Hello
+		</div>
+	</div> -->
+	<!-- 	<div id="filter">
+		</div>
+		<div id="test2">Lol</div>
+	</div> -->
+	<!--  <div id="filter"> -->
+	<!-- <div id="a"> -->
+	<!-- <div id="map"></div> -->
+	<!-- 			<div id="headlines_container">
+				<div id="headlines">
+				</div>
+			</div> -->
+	<!-- </div> -->
+	<!-- <div id="b"> -->
+	<!-- Hello -->
+	<!-- </div> -->
+	<!-- <div id="headlines_container"> -->
+	<!-- <div id="headlines"> -->
+	<!-- </div> -->
+	<!-- </div> -->
+	<!-- <div id="filter-selector">	 -->
+	<!-- </div> -->
+	<!-- </div> -->
+	<!-- div id="bar-left" class="">
+		<div id="top-bar">
+			<div id="top-bar-logo">
+				<img src="images/mapnewslogo.png">
+			</div>
+			<div id="top-bar-selector">
+				<button id="top-bar-sourceselector" type="button" class="btn btn-primary dropdown">
+					<div href="#" data-toggle="dropdown" class="dropdown-toggle">Sources
+						<b class="caret"></b>
+					</div>
+					<div id="dropdown-items" class="dropdown-menu shadow-sm">
+						<a class="dropdown-item selected" id="dropdown_bbc" onclick="toggle_provider(this)">BBC</a>
+						<a class="dropdown-item selected" id="dropdown_nyt" onclick="toggle_provider(this)">The New York Times</a>
+						<a class="dropdown-item selected" id="dropdown_tg" onclick="toggle_provider(this)">The Guardian</a>
+						<a class="dropdown-item selected" id="dropdown_r" onclick="toggle_provider(this)">Reuters</a>
+						<a class="dropdown-item selected" id="dropdown_lat" onclick="toggle_provider(this)">Los Angeles Times</a>
+					</div>
+				</button>
+				<div id="top-bar-searchbar" class="input-group mb-3">
+					<div class="input-group-prepend">
+						<span class="input-group-text" id="basic-addon1">
+							<i class="fas fa-search"></i>
+						</span>
+					</div>
+					<input id="search" type="text" class="form-control" placeholder="Search regex" aria-label="Search" aria-describedby="basic-addon1" oninput="search(this)">
+				</div>
+			</div>
+		</div>
+		<div id="headlines_container">
+			<div id="headlines">
+			</div>
+		</div>
+		<div id="headlines-navigation">
+			<nav aria-label="Page navigation example">
+				<ul class="pagination">
+					<li class="page-item page-prev" id="pagination-start"><a class="page-link" href="#" onclick="switch_to_page(CURRENT_PAGE-1)"><i class="fas fa-backward"></i></a></li>
+					<li class="page-item page-next"><a class="page-link" href="#" onclick="switch_to_page(CURRENT_PAGE+1)"><i class="fas fa-forward"></i></a></li>
+				</ul>
+			</nav>
+		</div>
+	</div> -->
+</body>
+
+</html>
