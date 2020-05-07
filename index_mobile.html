@@ -120,7 +120,6 @@
 /*-------------------------------------------------*/
 body {
 	margin-top: 0px;
-	position: relative;
 }
 
 .headline {
@@ -154,13 +153,16 @@ body {
 	overflow-y: scroll;
 	scroll-snap-type: y mandatory;
 
-	height: 100vh;
+	height: 100%;
 	width: 100vw;
 }
 
-#top-part,
+#top-part {
+	height: 100%;
+	scroll-snap-align: start;
+}
 #bottom-part {
-	height: 100vh;
+	height: 100%;
 	scroll-snap-align: start;
 }
 
@@ -172,7 +174,9 @@ body {
 
 #map {
 	width: 100vw;
-	height: 100vh;
+
+	min-height: -webkit-fill-available
+	/*height: 100vh;*/
 }
 
 /*To use position absolute in a relativ context*/
