@@ -309,7 +309,7 @@ class Headline {
 		this._add_listener();
 	}
 
-	_make_div = () => {
+	_make_div() {
 		const headline_template = `
 			<div class="headline">
 				<div class="card shadow-sm headline-card">
@@ -337,7 +337,7 @@ class Headline {
 		this.div = wrapper.firstElementChild;
 	}
 
-	_add_listener = () => {
+	_add_listener() {
 		this.div.onclick = async () => {
 			// Await since we want to wait for the first request to finish
 			await this.show_content();
@@ -346,12 +346,12 @@ class Headline {
 		}
 	}
 
-	get_content = async () => {
+	async get_content() {
 		let content = await get_news_by_key(this.key);
 		this.content = content;
 	}
 
-	show_content = async () => {
+	async show_content() {
 		if (this.content == null)
 			await this.get_content();
 
@@ -360,7 +360,7 @@ class Headline {
 		this.div.classList.add("showing");
 	}
 
-	show_markers = async () => {
+	async show_markers() {
 		if (this.content == null)
 			await this.get_content();
 
@@ -375,26 +375,26 @@ class Headline {
 		MAP.showItems(lls);
 	}
 
-	focus = () => {
+	focus() {
 		for(let headline of ALL_HEADLINES) {
 			headline.unfocus();
 		}
 		this.div.classList.add("focus")
 	}
 
-	unfocus = () => {
+	unfocus() {
 		this.div.classList.remove("focus")	
 	}
 
-	show = () => {
+	show() {
 		this.is_show = true;
 	}
 
-	hide = () => {
+	hide() {
 		this.is_show = false;
 	}
 
-	search_self = (allowed_sources, re_search_string) => {
+	search_self(allowed_sources, re_search_string) {
 		if(!allowed_sources.includes(this.source))
 			return false;
 
