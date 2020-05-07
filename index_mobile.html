@@ -58,10 +58,8 @@
 .headline.showing .headline-content {
 	max-height: 1000px;
 	padding-bottom: 5px;
-	font-size: 10pt;
 	transition: max-height 0.5s ease-in-out;
 }
-
 .headline-card.focus .headline-info {
 	border-top: 1px solid #f4a56d;
 }
@@ -133,12 +131,14 @@ body {
 	padding-bottom: 0.5em;
 }
 
-.headline:last-child {
-	/*padding-right: 7.5%;*/
+.headline-title {
+	font-size: 14pt;
 }
-
-.headline:first-child {
-	/*padding-left: 7.5%;	*/
+.headline-content {
+	font-size: 12pt;
+}
+.headline-info {
+	font-size: 10pt;
 }
 
 #headlines {
@@ -174,8 +174,8 @@ body {
 
 #map {
 	width: 100vw;
-
-	min-height: -webkit-fill-available
+	height: 100%;
+	/*min-height: -webkit-fill-available*/
 	/*height: 100vh;*/
 }
 
@@ -207,7 +207,7 @@ body {
 
 </style>
 
-<body onload="init()">
+<body onload="init(true)">
 	<div id="scrolling-wrapper">
 		<div id="top-part">
 			<div class="rel-wrapper">

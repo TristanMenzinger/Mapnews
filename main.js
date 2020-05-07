@@ -10,6 +10,8 @@ let SELECTED_PAGINATION_ELEM = null;
 
 let MAP;
 
+let IS_MOBILE;
+
 let NEWS_SOURCES = {
 	"bbc": {
 		"name": "BBC",
@@ -35,18 +37,19 @@ let NEWS_SOURCES = {
 
 let SEARCH_STRING = "";
 
-let init = async () => {
+let init = async (is_mobile) => {
+	IS_MOBILE = is_mobile;
 
 	// Fetch all headlines
 	let all_headlines = await get_headlines();
-	all_headlines = all_headlines.slice(1, 5)
 	for (let raw_headline of all_headlines) {
 		ALL_HEADLINES.push(new Headline(raw_headline))
 	}
 
 	map_init();
 
-	// apply_filters();
+
+	apply_filters();
 	update_headlines_container();
 
 	// update_after_filter();
@@ -181,7 +184,7 @@ let set_show_all_headlines = () => {
 	}
 }
 let update_headlines_container = () => {
-	
+
 	div_all_headlines = document.getElementById("headlines");
 	div_all_headlines.clearChildren();
 
@@ -190,9 +193,12 @@ let update_headlines_container = () => {
 			div_all_headlines.appendChild(headline.div);
 		}
 	}
-	// headlines_to_pages();
-	// adjust_pagination();
-	// switch_to_page(1);
+
+	if (!IS_MOBILE) {
+		headlines_to_pages();
+		adjust_pagination();
+		switch_to_page(1);
+	}
 }
 
 
@@ -201,9 +207,9 @@ let apply_filters = () => {
 	allowed_source_names = Object.keys(NEWS_SOURCES).filter(key => NEWS_SOURCES[key].selected).map(key => NEWS_SOURCES[key].name)
 	for (let headline of ALL_HEADLINES) {
 
-		if(headline.search_self(allowed_source_names, SEARCH_STRING)) {
+		if (headline.search_self(allowed_source_names, SEARCH_STRING)) {
 			headline.show()
-		}else {
+		} else {
 			headline.hide()
 		}
 
@@ -306,7 +312,8 @@ class Headline {
 		this.is_show = true;
 
 		this._make_div();
-		this._add_listener();
+		this._add_onclick_listener();
+		this._add_onswipe_listener();
 	}
 
 	_make_div() {
@@ -337,13 +344,68 @@ class Headline {
 		this.div = wrapper.firstElementChild;
 	}
 
-	_add_listener() {
+	_add_onclick_listener() {
 		this.div.onclick = async () => {
 			// Await since we want to wait for the first request to finish
 			await this.show_content();
 			this.show_markers()
 			this.focus()
 		}
+	}
+
+	_add_onswipe_listener() {
+
+		//this.div.addEventListener('touchstart', handleTouchStart, false);
+		//this.div.addEventListener('touchmove', handleTouchMove, false);
+
+		var xDown = null;
+		var yDown = null;
+
+		this.div.ontouchstart = (evt) => {
+			const firstTouch = evt.touches[0];
+			xDown = firstTouch.clientX;
+			yDown = firstTouch.clientY;
+		}
+
+		this.div.ontouchmove = (evt) => {
+			if (!xDown || !yDown) {
+				return;
+			}
+
+			var xUp = evt.touches[0].clientX;
+			var yUp = evt.touches[0].clientY;
+
+			var xDiff = xDown - xUp;
+			var yDiff = yDown - yUp;
+
+			if (Math.abs(xDiff) > Math.abs(yDiff)) { /*most significant*/
+				if (xDiff > 0) {
+					/* left swipe */
+					// console.log("left swipe");
+				} else {
+					/* right swipe */
+					// console.log("right swipe");
+				}
+			} else {
+				console.log(Math.abs(yDiff) / this.div.offsetHeight)
+				if (Math.abs(yDiff) / this.div.offsetHeight > 0.1) {
+					if (yDiff > 0) {
+						// console.log("up swipe");
+					} else {
+						console.log("down swipe");
+						this.remove_from_view()
+					}
+				}
+			}
+			/* reset values */
+			xDown = null;
+			yDown = null;
+		};
+	}
+
+	async remove_from_view() {
+		let div_headlines = document.getElementById("headlines");
+		div_headlines.removeChild(this.div)
 	}
 
 	async get_content() {
@@ -369,21 +431,21 @@ class Headline {
 		for (let ll of this.content.geolocations) {
 			if (ll != null) {
 				let coordinate = new mapkit.Coordinate(ll.lat, ll.lng)
-				lls.push(new mapkit.MarkerAnnotation(coordinate, { color: "#f4a56d", glyphText: ""+ll.count }))
+				lls.push(new mapkit.MarkerAnnotation(coordinate, { color: "#f4a56d", glyphText: "" + ll.count }))
 			}
 		}
 		MAP.showItems(lls);
 	}
 
 	focus() {
-		for(let headline of ALL_HEADLINES) {
+		for (let headline of ALL_HEADLINES) {
 			headline.unfocus();
 		}
 		this.div.classList.add("focus")
 	}
 
 	unfocus() {
-		this.div.classList.remove("focus")	
+		this.div.classList.remove("focus")
 	}
 
 	show() {
@@ -395,10 +457,10 @@ class Headline {
 	}
 
 	search_self(allowed_sources, re_search_string) {
-		if(!allowed_sources.includes(this.source))
+		if (!allowed_sources.includes(this.source))
 			return false;
 
-		if(this.title.toLowerCase().search(re_search_string.toLowerCase()) != -1)
+		if (this.title.toLowerCase().search(re_search_string.toLowerCase()) != -1)
 			return true;
 
 		return false;
@@ -440,12 +502,12 @@ let headline_selected = async (headline) => {
 }
 
 let clear_headlines = () => {
-	div_headlines = document.getElementById("headlines");
+	let div_headlines = document.getElementById("headlines");
 	div_headlines.clearChildren();
 }
 let show_headlines = (selected_headlines) => {
 	clear_headlines();
-	div_headlines = document.getElementById("headlines");
+	let div_headlines = document.getElementById("headlines");
 	for (let headline of selected_headlines) {
 		div_headlines.appendChild(headline.div);
 	}
@@ -510,68 +572,3 @@ if (typeof Element.prototype.clearChildren === 'undefined') {
 function insertAfter(newNode, referenceNode) {
 	referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 }
-
-
-
-// document.addEventListener('touchstart', handleTouchStart, false);        
-// document.addEventListener('touchmove', handleTouchMove, false);
-
-// var xDown = null;                                                        
-// var yDown = null;
-
-// function getTouches(evt) {
-//   return evt.touches ||             // browser API
-//          evt.originalEvent.touches; // jQuery
-// }                                                     
-
-// function handleTouchStart(evt) {
-//     const firstTouch = getTouches(evt)[0];                                      
-//     xDown = firstTouch.clientX;                                      
-//     yDown = firstTouch.clientY;                                      
-// };                                                
-
-// function handleTouchMove(evt) {
-//     if ( ! xDown || ! yDown ) {
-//         return;
-//     }
-
-//     var xUp = evt.touches[0].clientX;                                    
-//     var yUp = evt.touches[0].clientY;
-
-//     var xDiff = xDown - xUp;
-//     var yDiff = yDown - yUp;
-
-//     if ( Math.abs( xDiff ) > Math.abs( yDiff ) ) {/*most significant*/
-//         if ( xDiff > 0 ) {
-//             /* left swipe */ 
-//             console.log("left swipe");
-//         } else {
-//             /* right swipe */
-//             console.log("right swipe");
-//         }                       
-//     } else {
-//     	console.log(yDiff)
-//     	if(Math.abs(yDiff) > 10) {
-// 	        if ( yDiff > 0 ) {
-// 	            /* up swipe */ 
-// 	            console.log("up swipe");
-// 	            document.getElementById("filter").classList.add("show")
-// 	        } else { 
-// 	            /* down swipe */
-// 	            console.log("down swipe");
-// 	            document.getElementById("filter").classList.remove("show")
-// 	        }
-//         }                                                   
-//     }
-//     /* reset values */
-//     xDown = null;
-//     yDown = null;                                             
-// };
-
-
-
-
-
-
-
-
