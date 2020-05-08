@@ -52,14 +52,23 @@
 .headline-content {
 	max-height: 0px;
 	margin-top: 5px;
+	visibility: hidden;
 	transition: max-height 0.5s ease-in-out;
 }
 
 .headline.showing .headline-content {
+	visibility: visible;
 	max-height: 1000px;
 	padding-bottom: 5px;
 	transition: max-height 0.5s ease-in-out;
 }
+.headline.instant .headline-content {
+	transition: none;
+}
+.headline.showing.instant .headline-content {
+	transition: none;
+}
+
 .headline-card.focus .headline-info {
 	border-top: 1px solid #f4a56d;
 }
@@ -170,6 +179,8 @@ body {
 	position: absolute;
 	bottom: 0;
 	width: 100vw;
+	overflow: visible;
+
 }
 
 #map {
@@ -185,7 +196,7 @@ body {
 }
 
 #bottom-part {
-	padding: 0.5em;
+	padding: 3em;
 	display: flex;
 	flex-direction: column;
 }
@@ -198,13 +209,24 @@ body {
 	flex-direction: column;
 }
 #source-selector > button {
+	color: black;
 	margin-bottom: 0.5em;
 }
 #source-selector > button.selected {
 	background-color: gray;
-	color: white;
+	color: black;
 }
 
+#source-selector > button:hover {
+	background-color: white;
+}
+#source-selector > button.selected:hover {
+	background-color: gray;
+}
+
+#top-bar-searchbar > input {
+	font-size: 14pt;
+} 
 </style>
 
 <body onload="init(true)">
@@ -225,7 +247,7 @@ body {
 						<i class="fas fa-search"></i>
 					</span>
 				</div>
-				<input id="search" type="text" class="form-control" placeholder="Search regex" aria-label="Search" aria-describedby="basic-addon1" oninput="search(this)">
+				<input id="search" type="text" class="form-control" placeholder="Search (Regex)" aria-label="Search" aria-describedby="basic-addon1" oninput="search(this)">
 			</div>
 			<div id="source-selector">
 				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_bbc" onclick="toggle_provider(this)">BBC</button>

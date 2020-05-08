@@ -3,8 +3,7 @@ let PAGES = null;
 let MAX_PAGE_NR = null;
 
 let ALL_HEADLINES = [];
-
-let FILTERED_HEADLINES = null;
+let ONLY_SHOWING = [];
 
 let SELECTED_PAGINATION_ELEM = null;
 
@@ -15,11 +14,11 @@ let IS_MOBILE;
 let NEWS_SOURCES = {
 	"bbc": {
 		"name": "BBC",
-		"selected": true
+		"selected": false
 	},
 	"nyt": {
 		"name": "The New York Times",
-		"selected": true
+		"selected": false
 	},
 	"tg": {
 		"name": "The Guardian",
@@ -27,15 +26,20 @@ let NEWS_SOURCES = {
 	},
 	"r": {
 		"name": "Reuters",
-		"selected": true
+		"selected": false
 	},
 	"lat": {
 		"name": "Los Angeles Times",
-		"selected": true
+		"selected": false
 	},
 }
 
 let SEARCH_STRING = "";
+
+let scroll_timeout;
+let is_scrolling = false;
+let last_in_view = null;
+let last_in_view_index = null;
 
 let init = async (is_mobile) => {
 	IS_MOBILE = is_mobile;
@@ -51,6 +55,49 @@ let init = async (is_mobile) => {
 
 	apply_filters();
 	update_headlines_container();
+
+
+	// TODO!
+	last_in_view = ALL_HEADLINES[0];
+	last_in_view_index = 0;
+
+	if(IS_MOBILE) {
+		let div_headlines = document.getElementById("headlines");
+
+		div_headlines.onscroll = (event) => {
+
+			if(!is_scrolling) {
+				is_scrolling = true;
+				console.log("Scroll started");
+
+				// Reset their un-force-minimized state, but do so instantly without the animation
+				ALL_HEADLINES.filter(h => h != last_in_view).map(h => h.reset_from_state(true));
+
+			}
+
+			window.clearTimeout(scroll_timeout);
+			scroll_timeout = setTimeout(function() {
+				
+				// Get the headline in view
+				let in_view = ALL_HEADLINES.filter(x => x.in_view() && x.is_show)
+				let in_view_len = in_view.length
+				in_view = in_view[0]
+
+				// Check if one is completely in view
+				if(in_view_len == 1) {
+					console.log('Scrolling has stopped.');
+					is_scrolling = false;
+					last_in_view = in_view;
+
+					last_in_view.show_markers();
+
+					// Force minimize all headlines around.
+					ALL_HEADLINES.filter(h => h != last_in_view).map(h => h.minimize(true))
+
+				}
+			}, 30);
+		};
+	}
 
 	// update_after_filter();
 
@@ -199,6 +246,8 @@ let update_headlines_container = () => {
 		adjust_pagination();
 		switch_to_page(1);
 	}
+
+	ONLY_SHOWING = ALL_HEADLINES.filter(h => h.is_show)
 }
 
 
@@ -308,6 +357,8 @@ class Headline {
 		this.published = topnews_data.published;
 		this.source = topnews_data.source;
 		this.key = topnews_data.key;
+		this.summary = topnews_data.summary;
+		this.geolocations = topnews_data.geolocations;
 
 		this.is_show = true;
 
@@ -325,6 +376,7 @@ class Headline {
 							${this.title}
 						</div>
 						<div class="headline-content">
+							${this.summary}
 						</div>
 						<div class="headline-info">
 							<div class="headline-source">
@@ -347,9 +399,9 @@ class Headline {
 	_add_onclick_listener() {
 		this.div.onclick = async () => {
 			// Await since we want to wait for the first request to finish
-			await this.show_content();
+			await this.expand();
 			this.show_markers()
-			this.focus()
+			// this.focus()
 		}
 	}
 
@@ -408,27 +460,37 @@ class Headline {
 		div_headlines.removeChild(this.div)
 	}
 
-	async get_content() {
-		let content = await get_news_by_key(this.key);
-		this.content = content;
+	reset_from_state(instant) {
+		if(this.is_expanded)
+			this.expand(true, instant);
+		else
+			this.minimize(true, instant);
 	}
 
-	async show_content() {
-		if (this.content == null)
-			await this.get_content();
-
+	expand(no_set, instant) {
 		let content_div = this.div.querySelector(".headline-content")
-		content_div.innerHTML = this.content.summary
+		if(instant)
+			this.div.classList.add("instant");
+
 		this.div.classList.add("showing");
+		if(!no_set)
+			this.is_expanded = true;
 	}
 
-	async show_markers() {
-		if (this.content == null)
-			await this.get_content();
+	minimize(no_set, instant) {
+		let content_div = this.div.querySelector(".headline-content")
+		if(instant)
+			this.div.classList.remove("instant");
 
+		this.div.classList.remove("showing");
+		if(!no_set)
+			this.is_expanded = false;
+	}
+
+	show_markers() {
 		MAP.removeAnnotations(MAP.annotations)
 		let lls = []
-		for (let ll of this.content.geolocations) {
+		for (let ll of this.geolocations) {
 			if (ll != null) {
 				let coordinate = new mapkit.Coordinate(ll.lat, ll.lng)
 				lls.push(new mapkit.MarkerAnnotation(coordinate, { color: "#f4a56d", glyphText: "" + ll.count }))
@@ -437,16 +499,16 @@ class Headline {
 		MAP.showItems(lls);
 	}
 
-	focus() {
-		for (let headline of ALL_HEADLINES) {
-			headline.unfocus();
-		}
-		this.div.classList.add("focus")
-	}
+	// focus() {
+	// 	for (let headline of ALL_HEADLINES) {
+	// 		headline.unfocus();
+	// 	}
+	// 	this.div.classList.add("focus")
+	// }
 
-	unfocus() {
-		this.div.classList.remove("focus")
-	}
+	// unfocus() {
+	// 	this.div.classList.remove("focus")
+	// }
 
 	show() {
 		this.is_show = true;
@@ -464,6 +526,14 @@ class Headline {
 			return true;
 
 		return false;
+	}
+
+	hide_out_of_view() {
+
+	}
+
+	in_view() {
+		return this.div.getBoundingClientRect().x == 0 && this.div.getBoundingClientRect().y != 0
 	}
 
 }
@@ -488,18 +558,18 @@ let get_news_by_key = async (key) => {
 }
 
 
-let headline_selected = async (headline) => {
-	let content = await get_news_by_key(headline.key);
-	show_markers_for_content(content);
-	headline.content = content;
+// let headline_selected = async (headline) => {
+// 	let content = await get_news_by_key(headline.key);
+// 	show_markers_for_content(content);
+// 	headline.content = content;
 
 
-	let content_div = headline.div.querySelector(".headline-content")
-	content_div.innerHTML = content.summary
-	content_div.classList.add("showing");
+// 	let content_div = headline.div.querySelector(".headline-content")
+// 	content_div.innerHTML = content.summary
+// 	content_div.classList.add("showing");
 
-	console.log(headline)
-}
+// 	console.log(headline)
+// }
 
 let clear_headlines = () => {
 	let div_headlines = document.getElementById("headlines");
