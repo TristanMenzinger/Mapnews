@@ -229,7 +229,7 @@ let headlines_to_pages = () => {
 	page_nr = 0
 	const headlines_to_show = ALL_HEADLINES.filter(h => h.is_show);
 	while (i < headlines_to_show.length) {
-		if (i % 10 == 0) {
+		if (i % 20 == 0) {
 			page_nr++;
 			pages[page_nr + ""] = []
 		}
