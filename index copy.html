@@ -9,8 +9,6 @@
 	<script src="https://unpkg.com/leaflet@1.3.3/dist/leaflet.js"></script>
 	<script src='https://unpkg.com/leaflet.mapkitmutant@latest/Leaflet.MapkitMutant.js'></script> -->
 	<script src="main.js"></script>
-
-	<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <style>
 	html,
@@ -18,9 +16,82 @@ body {
 	margin-top: 0px;
 }
 
-/*>>> HEADLINE CARD */
+body {
+	display: flex;
+}
+
+#bar-left {
+	flex-basis: 25em;
+	max-width: 25em;
+	flex-shrink: none;
+	flex-grow: none;
+	background-color: rgb(252, 252, 252);
+	display: flex;
+	flex-direction: column;
+}
+
+/*#bar-left.mini {
+	flex-basis: 3em;
+	overflow: hidden;
+}
+
+#bar-left.mini #logo-logo {
+	display: none;
+}
+#bar-left.mini #logo-expand {
+	margin-left: -0.5em;
+}
+#bar-left.mini #headlines, #bar-left.mini #headlines-navigation, #bar-left.mini #selector {
+	display: none;
+}*/
+
+#bar-left>*:not(:last-child) {
+	padding: 15px;
+}
+
+
+#headlines_container {
+	/*this is ugly but works*/
+	height: calc(100vh - 10em - 30px);
+	overflow: auto;
+
+	-webkit-box-shadow: inset 0px 10px 8px -4px rgba(0,0,0,0.075);
+	-moz-box-shadow: inset 0px 10px 8px -4px rgba(0,0,0,0.075);
+	box-shadow: inset 0px 10px 8px -4px rgba(0,0,0,0.075);
+}
+
+#headlines {
+	margin-left: -15px;
+	margin-right: -15px;
+
+	/*Take available space*/
+	flex-basis: 1;
+	overflow: auto;
+	min-height: 0;
+
+	display: flex;
+	flex-direction: column;
+}
+
+#headlines > :last-child {
+	margin-bottom: 20px;
+}
+
+#headlines>* {
+	margin-bottom: 5px;
+}
+
+#headlines-navigation {
+	display: flex;
+	margin-top: 10px;
+	justify-content: center;
+}
+
+
 .headline-card {
 	transition: box-shadow 0.15s ease-in-out;
+	margin-left: 15px;
+	margin-right: 15px;
 	/*background-color: rgba(243, 165, 115, 0.1)*/
 	cursor: pointer;
 }
@@ -58,7 +129,8 @@ body {
 	transition: max-height 0.5s ease-in-out;
 }
 
-.headline.showing .headline-content {
+.headline-card.showing .headline-content {
+	max-height: 1000px;
 	padding-bottom: 5px;
 	font-size: 10pt;
 	transition: max-height 0.5s ease-in-out;
@@ -82,8 +154,13 @@ body {
 	flex: 1;
 }
 
+.page-link {
+	height: 2.2em;
+}
+.page-item .selected {
+	background-color: lightgray;
+}
 
-/*>>> DROPDOWN STYLING*/
 .dropdown {
 	background-color: #f4a56d !important;
 	border-color: #f4a56d !important;
@@ -116,68 +193,6 @@ body {
 	flex: 1;
 }
 
-/*-------------------------------------------------*/
-/*SPECIFIC TO NON-MOBILE*/
-/*-------------------------------------------------*/
-.headline-content {
-	font-size: 10pt;
-}
-.headline.showing .headline-content {
-	max-height: 9999px;
-}
-
-body {
-	display: flex;
-}
-
-.headline {
-	margin-left: 15px;
-	margin-right: 15px;
-}
-
-#bar-left {
-	flex-basis: 25em;
-	max-width: 25em;
-	flex-shrink: none;
-	flex-grow: none;
-	background-color: rgb(252, 252, 252);
-	display: flex;
-	flex-direction: column;
-}
-
-#bar-left>*:not(:last-child) {
-	padding: 15px;
-}
-
-#headlines_container {
-	/*this is ugly but works*/
-	height: calc(100vh - 10em - 30px);
-	overflow: auto;
-
-	-webkit-box-shadow: inset 0px 10px 8px -4px rgba(0,0,0,0.075);
-	-moz-box-shadow: inset 0px 10px 8px -4px rgba(0,0,0,0.075);
-	box-shadow: inset 0px 10px 8px -4px rgba(0,0,0,0.075);
-}
-
-#headlines {
-	margin-left: -15px;
-	margin-right: -15px;
-
-	/*Take available space*/
-	flex-basis: 1;
-	overflow: auto;
-	min-height: 0;
-
-	display: flex;
-	flex-direction: column;
-}
-#headlines > :last-child {
-	margin-bottom: 20px;
-}
-#headlines > *:not(:last-child) {
-	margin-bottom: 0.5em;
-}
-
 #top-bar {
 	display: flex;
 	flex: 1;
@@ -208,21 +223,6 @@ body {
 	flex: 1;
 	margin-bottom: 10px;
 }
-
-#headlines-navigation {
-	display: flex;
-	margin-top: 10px;
-	justify-content: center;
-}
-
-/*>>> PAGE PICKER*/
-.page-link {
-	height: 2.2em;
-}
-.page-item .selected {
-	background-color: lightgray;
-}
-
 
 </style>
 

@@ -1,0 +1,82 @@
+<html>
+<style type="text/css">
+#container {
+	margin-top: 200px;
+	background-color: red;
+	height: 300px;
+	display: flex;
+	align-items: flex-end;
+}
+
+#first {
+	width: 50%;
+	height: 500px;
+	background-color: gray;
+}
+
+.scrolling-wrapper {
+	position: static;
+	margin-top: 150px;
+	width: 100%;
+
+	display: flex;
+	flex-wrap: nowrap;
+	overflow-x: auto;
+	align-items: flex-end;
+	scroll-snap-type: x mandatory;
+
+	overflow-y: auto;
+}
+
+.card {
+	flex-shrink: 0;
+	background-color: gray;
+	height: 300px;
+	width: 75vw;
+	scroll-snap-align: start;
+}
+
+.card.special {
+	height: 500px;
+	background-color: red;
+}
+
+.scrolling-wrapper {
+	max-height: 300px;
+}
+
+.topcontainer {
+	position: fixed;
+	bottom: 0;
+	width: 100vw;
+	display: flex;
+	align-items: flex-end;
+}
+
+.ttc {
+	position: absolute;
+	width: 100vw;
+}
+</style>
+
+<body>
+	<div class="ttc">
+	<div class="topcontainer">
+		<div class="scrolling-wrapper">
+			<div id="card1" class="card special">Hi!</div>
+			<div id="card2" class="card">Hi!</div>
+			<div id="card3" class="card special">Hi!</div>
+			<div id="card4" class="card">Hi!</div>
+			<div id="card3" class="card special">Hi!</div>
+			<div id="card5" class="card">Hi!</div>
+			<div id="card3" class="card special">Hi!</div>
+			<div id="card5" class="card">Hi!</div>
+			<div id="card3" class="card special">Hi!</div>
+			<div id="card5" class="card">Hi!</div>
+			<div id="card3" class="card special">Hi!</div>		
+		</div>
+	</div>
+	</div>
+</body>
+
+</html>

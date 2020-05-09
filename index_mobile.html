@@ -58,8 +58,8 @@
 
 .headline.showing .headline-content {
 	visibility: visible;
-	max-height: 1000px;
 	padding-bottom: 5px;
+	overflow: scroll;
 	transition: max-height 0.5s ease-in-out;
 }
 .headline.instant .headline-content {
@@ -146,6 +146,10 @@ body {
 .headline-content {
 	font-size: 12pt;
 }
+.headline.showing .headline-content {
+	visibility: visible;
+	max-height: 65vh;
+}
 .headline-info {
 	font-size: 10pt;
 }
@@ -196,7 +200,7 @@ body {
 }
 
 #bottom-part {
-	padding: 3em;
+	padding: 5em;
 	display: flex;
 	flex-direction: column;
 }
@@ -247,7 +251,7 @@ body {
 						<i class="fas fa-search"></i>
 					</span>
 				</div>
-				<input id="search" type="text" class="form-control" placeholder="Search (Regex)" aria-label="Search" aria-describedby="basic-addon1" oninput="search(this)">
+				<input id="search" type="text" class="form-control" placeholder="Search for Names or Places(Regex)" aria-label="Search" aria-describedby="basic-addon1" oninput="search(this)">
 			</div>
 			<div id="source-selector">
 				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_bbc" onclick="toggle_provider(this)">BBC</button>
