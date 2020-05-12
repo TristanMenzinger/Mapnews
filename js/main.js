@@ -298,7 +298,7 @@ class Headline {
 		this.published = topnews_data.published;
 		this.source = topnews_data.source;
 		this.key = topnews_data.key;
-		this.summary = topnews_data.summary;
+		this.summary = replace_http(topnews_data.summary);
 		this.geolocations = topnews_data.geolocations;
 
 		this.is_show = true;
@@ -564,6 +564,14 @@ let fill_headline_template = (headline) => {
 // --------------------------------------------------------------------------------------------------
 // Polyfills & Helpers.
 // --------------------------------------------------------------------------------------------------
+
+// Replaces all unsafe links with https:// links. 
+// Works for these sources, otherwise probaby not a good idea
+// @param 	{string}		inner_html_string 		The html content with unsafe links
+// @return 	{string}		inner_html_string		The html content with safe links
+let replace_http = (inner_html_string) => {
+	return inner_html_string.replace(/http:\/\//g, 'https:\/\/');
+}
 
 // Returns a dom element from a filled template string
 // @param 	{filled_template_string}	search_string 		The search string, can be null if not required
