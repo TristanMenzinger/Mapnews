@@ -1,0 +1,117 @@
+/*-------------------------------------------------*/
+/*SPECIFIC TO MOBILE*/
+/*-------------------------------------------------*/
+body {
+    margin-top: 0px;
+}
+
+.headline {
+    scroll-snap-align: start;
+    display: inline-block;
+    width: 100%;
+    white-space: initial;
+    vertical-align: bottom;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    padding-bottom: 0.5em;
+}
+
+.headline-title {
+    font-size: 14pt;
+}
+
+.headline-content {
+    font-size: 12pt;
+}
+
+.headline.showing .headline-content {
+    visibility: visible;
+    max-height: 65vh;
+}
+
+.headline-info {
+    font-size: 10pt;
+}
+
+#headlines {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scroll-snap-type: x mandatory;
+}
+
+#scrolling-wrapper {
+    overflow-x: scroll;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+
+    height: 100%;
+    width: 100vw;
+}
+
+#top-part {
+    height: 100%;
+    scroll-snap-align: start;
+}
+
+#bottom-part {
+    height: 100%;
+    scroll-snap-align: start;
+}
+
+#headlines_container {
+    position: absolute;
+    bottom: 0;
+    width: 100vw;
+    overflow: visible;
+
+}
+
+#map {
+    width: 100vw;
+    height: 100%;
+    /*min-height: -webkit-fill-available*/
+    /*height: 100vh;*/
+}
+
+/*To use position absolute in a relativ context*/
+.rel-wrapper {
+    position: relative;
+}
+
+#bottom-part {
+    padding: 3em;
+    display: flex;
+    flex-direction: column;
+}
+
+#searchbar {
+    height: 2em;
+}
+
+#source-selector {
+    display: flex;
+    flex-direction: column;
+}
+
+#source-selector>button {
+    color: black;
+    margin-bottom: 0.5em;
+}
+
+#source-selector>button.selected {
+    background-color: rgb(235, 131, 40);
+    color: black;
+}
+
+#source-selector>button:hover {
+    background-color: white;
+}
+
+#source-selector>button.selected:hover {
+    background-color: rgb(235, 131, 40);
+}
+
+#top-bar-searchbar>input {
+    font-size: 14pt;
+}

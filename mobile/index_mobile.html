@@ -5,14 +5,14 @@
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 	<script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
-	<!-- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css" />
-	<script src="https://unpkg.com/leaflet@1.3.3/dist/leaflet.js"></script>
-	<script src='https://unpkg.com/leaflet.mapkitmutant@latest/Leaflet.MapkitMutant.js'></script> -->
-	<script src="js/main.js"></script>
-	<link rel="stylesheet" href="css/general.css" />
-	<link rel="stylesheet" href="css/desktop.css" />
+
+	<script src="../js/main.js"></script>
+	<link rel="stylesheet" href="../css/general.css" />
+	<link rel="stylesheet" href="../css/mobile.css" />
+
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
+
 <script type="text/javascript">
 	const user_mobile = (navigator.userAgent.match(/Android/i) ||
 						 navigator.userAgent.match(/webOS/i) ||
@@ -21,15 +21,76 @@
 						 navigator.userAgent.match(/BlackBerry/i) ||
 						 navigator.userAgent.match(/Windows Phone/i));
 	const width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-	if (user_mobile && width < 1000) {
-		document.location = "mobile/index_mobile.html";
+	if (!user_mobile || width > 1000) {
+		document.location = "../index.html";
 	}
 </script>
 
-
-
-<body onload="init()">
-	<div id="bar-left" class="">
+<body onload="init(true)">
+	<div id="scrolling-wrapper">
+		<div id="top-part">
+			<div class="rel-wrapper">
+				<div id="map"></div>
+				<div id="headlines_container">
+					<div id="headlines">
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="bottom-part">
+			<div id="top-bar-searchbar" class="input-group mb-3">
+				<div class="input-group-prepend">
+					<span class="input-group-text" id="basic-addon1">
+						<i class="fas fa-search"></i>
+					</span>
+				</div>
+				<input id="search" type="text" class="form-control" placeholder="Search for Names or Places(Regex)" aria-label="Search" aria-describedby="basic-addon1" oninput="search(this)">
+			</div>
+			<div id="source-selector">
+				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_bbc" onclick="toggle_provider(this)">BBC</button>
+				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_nyt" onclick="toggle_provider(this)">The New York Times</button>
+				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_tg" onclick="toggle_provider(this)">The Guardian</button>
+				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_r" onclick="toggle_provider(this)">Reuters</button>
+				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_lat" onclick="toggle_provider(this)">Los Angeles Times</button>
+			</div>
+		</div>
+	</div>
+	<!-- 		<div id="container">
+		<div id="top-part">
+			Hello!
+			<div id="map"></div>
+			<div id="headlines_container">
+				<div id="headlines">
+				</div>
+			</div>
+		</div>
+		<div id="bottom-part">
+			Hello
+		</div>
+	</div> -->
+	<!-- 	<div id="filter">
+		</div>
+		<div id="test2">Lol</div>
+	</div> -->
+	<!--  <div id="filter"> -->
+	<!-- <div id="a"> -->
+	<!-- <div id="map"></div> -->
+	<!-- 			<div id="headlines_container">
+				<div id="headlines">
+				</div>
+			</div> -->
+	<!-- </div> -->
+	<!-- <div id="b"> -->
+	<!-- Hello -->
+	<!-- </div> -->
+	<!-- <div id="headlines_container"> -->
+	<!-- <div id="headlines"> -->
+	<!-- </div> -->
+	<!-- </div> -->
+	<!-- <div id="filter-selector">	 -->
+	<!-- </div> -->
+	<!-- </div> -->
+	<!-- div id="bar-left" class="">
 		<div id="top-bar">
 			<div id="top-bar-logo">
 				<img src="images/mapnewslogo.png">
@@ -69,8 +130,7 @@
 				</ul>
 			</nav>
 		</div>
-	</div>
-	<div id="map">
+	</div> -->
 </body>
 
 </html>
