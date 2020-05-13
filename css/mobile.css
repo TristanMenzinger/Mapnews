@@ -33,6 +33,21 @@ body {
     font-size: 10pt;
 }
 
+.headline.showing .close {
+    font-size: 24pt;
+}
+
+.headline-content a {
+    font-size: 10pt;
+}
+
+/*.headline.showing .headline-badges {
+    display: initial;
+}
+.headline .headline-badges {
+    display: none;
+}*/
+
 #headlines {
     overflow-x: scroll;
     overflow-y: hidden;

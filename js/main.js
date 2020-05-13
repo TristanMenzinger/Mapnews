@@ -107,8 +107,9 @@ let initialize_scroll_listener = () => {
 				console.log("Scroll started");
 
 				// Reset their un-force-minimized state, but do so instantly without the animation
-				ALL_HEADLINES.filter(h => h != LAST_HL_IN_VIEW).map(h => h.reset_from_state(true));
+				// ALL_HEADLINES.filter(h => h != LAST_HL_IN_VIEW).map(h => h.reset_from_state(true));
 
+				ALL_HEADLINES.map(h => h.div.style.maxHeight = "none");
 			}
 
 			window.clearTimeout(scroll_timeout);
@@ -128,7 +129,12 @@ let initialize_scroll_listener = () => {
 					LAST_HL_IN_VIEW.show_markers(true);
 
 					// Force minimize all headlines around.
-					ALL_HEADLINES.filter(h => h != LAST_HL_IN_VIEW).map(h => h.minimize(true))
+					// ALL_HEADLINES.filter(h => h != LAST_HL_IN_VIEW).map(h => h.minimize(true))
+
+					let height = LAST_HL_IN_VIEW.div.getBoundingClientRect().height;
+					ALL_HEADLINES.map(h => h.div.style.maxHeight = height+"px");
+					LAST_HL_IN_VIEW.div.style.maxHeight = "none";
+
 
 				}
 			}, 30);

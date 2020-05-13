@@ -79,6 +79,7 @@
 .headline-title {
 	font-weight: 500;
 	margin-right: 15px;
+	margin-top: -3px;
 }
 
 .headline-date {}
@@ -93,8 +94,13 @@
 }
 .headline.showing .close {
 	display: initial;
-	right: 15px;
+	right: 5px;
 	top: 10px;
+
+	padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+
 	position: absolute;
 	color: rgb(160, 160, 160);
 	font-size: 12pt;
