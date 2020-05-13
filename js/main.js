@@ -9,6 +9,8 @@ let SELECTED_PAGINATION_DIV = null;
 // Global variable containing all Headlines
 let ALL_HEADLINES = [];
 
+let SHAPEFILE_CACHE = {};
+
 // The map
 let MAP;
 
@@ -34,6 +36,13 @@ let NEWS_SOURCES = {
 		"name": "Los Angeles Times",
 		"selected": true
 	},
+}
+
+let SANE_COUNTRY_NAMES = {
+	"Us": "United States of America",
+	"U.S.": "United States of America",
+	"U.s.": "United States of America",
+	"Uk": "United Kingdom"
 }
 
 // Scrolling wizardry
@@ -116,7 +125,7 @@ let initialize_scroll_listener = () => {
 					is_scrolling = false;
 					LAST_HL_IN_VIEW = in_view;
 
-					LAST_HL_IN_VIEW.show_markers();
+					LAST_HL_IN_VIEW.show_markers(true);
 
 					// Force minimize all headlines around.
 					ALL_HEADLINES.filter(h => h != LAST_HL_IN_VIEW).map(h => h.minimize(true))
@@ -296,32 +305,77 @@ class Headline {
 	constructor(topnews_data) {
 		this.title = topnews_data.title;
 		this.published = topnews_data.published;
+		this.link = topnews_data.link;
 		this.source = topnews_data.source;
 		this.key = topnews_data.key;
 		this.summary = replace_http(topnews_data.summary);
-		this.geolocations = topnews_data.geolocations;
 
+		this.geolocations = topnews_data.geolocations;
+		this._sanitize_geolocation_names();
+
+		// Whether the Headline is to be shown on the next headline update call
 		this.is_show = true;
 
+		// Whether the Headline is expanded, e.g. the content is shown
+		this.is_expanded = false;
+
+		// Whether the Headline is currently in focus
+		this.is_focus = false;
+
 		this._make_div();
-		this._add_onclick_listener();
+		this._add_onclick_listeners();
 		this._add_onswipe_listener();
+	}
+
+	// Sanitizes the geolocation names according to the global JSON with information about unified 
+	// Country names
+	_sanitize_geolocation_names() {
+		for (let geolocation of this.geolocations) {
+			if (geolocation.name in SANE_COUNTRY_NAMES) {
+				// console.log("replacing", geolocation.name, "with", SANE_COUNTRY_NAMES[geolocation.name]);
+				geolocation.name = SANE_COUNTRY_NAMES[geolocation.name];
+			}
+		}
 	}
 
 	// Create the headline dom element from the template
 	// Uses title, summary, surce and published (publish-date) as inputs.
 	_make_div() {
 		this.div = fill_headline_template(this);
+
+		let dom_badges = this.div.querySelector(".headline-badges")
+		for (let geolocation of this.geolocations) {
+			let badge;
+			if (geolocation.type == "point") {
+				badge = div_from_template("<span class='badge badge-info badge-point'></span>");
+			} else if (geolocation.type == "country") {
+				badge = div_from_template("<span class='badge badge-info badge-country'></span>");
+			} else {
+				continue;
+			}
+			badge.textContent = geolocation.name;
+			badge.onclick = (event) => {
+				MAP.setCenterAnimated(new mapkit.Coordinate(geolocation.lat, geolocation.lng), false);
+				event.stopPropagation();
+			}
+			dom_badges.appendChild(badge)
+		}
+
 	}
 
 	// Adds an onclick listener to the headline card
 	// On touch / click, the headline is expanded and the markers shown
-	_add_onclick_listener() {
-		this.div.onclick = async () => {
-			// Await since we want to wait for the first request to finish
-			await this.expand();
-			this.show_markers()
-			// this.focus()
+	_add_onclick_listeners() {
+		this.div.onclick = async (event) => {
+			this.focus();
+			this.expand();
+			this.show_markers(true)
+		};
+
+		this.div.querySelector(".close").onclick = (event) => {
+			// Otherwise the listener just above is triggered
+			this.minimize();
+			event.stopPropagation();
 		}
 	}
 
@@ -375,6 +429,17 @@ class Headline {
 		};
 	}
 
+	focus() {
+		ALL_HEADLINES.map(h => h.unfocus());
+		this.is_focus = true;
+		this.div.classList.add("focus");
+	}
+
+	unfocus() {
+		this.is_focus = false;
+		this.div.classList.remove("focus");
+	}
+
 	// Resets the headline's state to it's notated state (can be called to reverse it if the dom was mutated
 	// directly by calling expand or minimize with no_set = true)
 	// @param 	{bool} 		instant 			If true, the object is shown immediatly, skipping any animations
@@ -391,8 +456,11 @@ class Headline {
 	// @param 	{bool} 		instant 			If true, the object is shown immediatly, skipping any animations
 	expand(no_set, instant) {
 		let content_div = this.div.querySelector(".headline-content")
+
 		if (instant)
 			this.div.classList.add("instant");
+		else
+			this.div.classList.remove("instant");
 
 		this.div.classList.add("showing");
 		if (!no_set)
@@ -405,7 +473,10 @@ class Headline {
 	// @param 	{bool} 		instant 			If true, the object is shown immediatly, skipping any animations
 	minimize(no_set, instant) {
 		let content_div = this.div.querySelector(".headline-content")
+
 		if (instant)
+			this.div.classList.add("instant");
+		else
 			this.div.classList.remove("instant");
 
 		this.div.classList.remove("showing");
@@ -415,16 +486,47 @@ class Headline {
 
 	// Show's the headlines markers on the map
 	// Removes all other markers from the map
-	show_markers() {
-		MAP.removeAnnotations(MAP.annotations)
+	async show_markers(truefocus) {
+		clear_map();
 		let lls = []
 		for (let ll of this.geolocations) {
-			if (ll != null) {
+			if (ll != null && ll.type != "country") {
 				let coordinate = new mapkit.Coordinate(ll.lat, ll.lng)
-				lls.push(new mapkit.MarkerAnnotation(coordinate, { color: "#f4a56d", glyphText: "" + ll.count }))
+				// lls.push(new mapkit.MarkerAnnotation(coordinate, { color: "#f4a56d", glyphText: "" + ll.count }))
+				lls.push(new mapkit.MarkerAnnotation(coordinate, {
+					color: "#f4a56d",
+					subtitle: ll.name,
+					subtitleVisibility: mapkit.FeatureVisibility.Visible,
+					// glyphText: ll.name
+					glyphText: ll.count + ""
+				}))
 			}
 		}
 		MAP.showItems(lls);
+
+		if (focus)
+			this.focus_on_map();
+
+		for (let ll of this.geolocations) {
+			if (ll != null && ll.type === "country") {
+				// console.log(ll.name, "to", unified_name);
+				let async_closure = async () => {
+					let unified_name = ll.name.toUpperCase().replace(/ /g, "_");
+					let country_shapefile = await get_shapefile_wcache(unified_name);
+					let polygons = make_polygons(country_shapefile);
+					MAP.addOverlays(polygons);
+				}
+				async_closure();
+			}
+		}
+	}
+
+	focus_on_map() {
+		let center = get_lat_lng_center(expand_geolocations(this.geolocations));
+		// MAP.setCenterAnimated(new mapkit.Coordinate(center[0], center[1]));
+		map.cameraZoomRange = new mapkit.CameraZoomRange(2000000, 999999999999);
+		MAP.setCenterAnimated(new mapkit.Coordinate(center[0], center[1]), false);
+		map.cameraZoomRange = new mapkit.CameraZoomRange(0, 999999999999);
 	}
 
 	// Set the headline to be shown.
@@ -496,6 +598,15 @@ let get_headlines = async () => {
 		})
 }
 
+
+let get_shapefile = async (name) => {
+	return fetch("../countryshapes/" + name + ".js")
+		.then(response => response.json())
+		.then(result => {
+			return result
+		})
+}
+
 // --------------------------------------------------------------------------------------------------
 // Template fillers
 // --------------------------------------------------------------------------------------------------
@@ -543,8 +654,15 @@ let fill_headline_template = (headline) => {
 						<div class="headline-title">
 							${headline.title}
 						</div>
+						<button type="button" class="close" aria-label="Close">
+  							<span aria-hidden="true">&times;</span>
+						</button>
+						<div class="headline-badges">
+						</div>
 						<div class="headline-content">
 							${headline.summary}
+							<br>
+							<a target="_blank" rel="noopener noreferrer" href="${headline.link}">Read More</a>
 						</div>
 						<div class="headline-info">
 							<div class="headline-source">
@@ -561,9 +679,110 @@ let fill_headline_template = (headline) => {
 	return div_from_template(headline_template);
 }
 
+
+
+let get_shapefile_wcache = async (name) => {
+	if (name in SHAPEFILE_CACHE) {
+		console.log("Serving Shapefile from Cache")
+		return SHAPEFILE_CACHE[name];
+	} else {
+		SHAPEFILE_CACHE[name] = await get_shapefile(name);
+		return SHAPEFILE_CACHE[name];
+	}
+}
+
+
 // --------------------------------------------------------------------------------------------------
 // Polyfills & Helpers.
 // --------------------------------------------------------------------------------------------------
+
+let clear_map = () => {
+	MAP.removeAnnotations(MAP.annotations)
+	MAP.removeOverlays(MAP.overlays)
+}
+
+// CAREFUL: Lat lng are reversed in country shapefiles
+let make_polygons = (country_pts) => {
+	let polygons = [];
+	for (let pts of country_pts) {
+		polygons.push(make_polygon(pts[0]));
+	}
+	return polygons;
+}
+
+
+// CAREFUL: Lat lng are reversed in country shapefiles
+let make_polygon = (points) => {
+	points = points.map(point => new mapkit.Coordinate(point[1], point[0]));
+	var style = new mapkit.Style({
+		strokeColor: "#f4a56d",
+		strokeOpacity: .4,
+		fillColor: "#f4a56d",
+		fillOpacity: .3,
+		lineWidth: 2,
+		lineJoin: "round",
+		// lineDash: [2, 2, 6, 2, 6, 2]
+	});
+
+	return new mapkit.PolygonOverlay([points], { style: style });
+}
+
+// Converts radians to degrees
+// @param {float}	radians 	The angle in radians 
+// @return {float} 				The angle in degrees
+let rad_to_deg = (radians) => {
+	return radians * 180 / Math.PI;
+}
+
+// Converts degrees to radians
+// @param {float}	degrees 	The angle in degree
+// @return {float} 				The angle in radians
+let deg_to_rad = (degrees) => {
+	return degrees * Math.PI / 180;
+}
+
+
+// Expands an array of geolocations by the "count" attribute
+// E.g. if UK has count 6 -> returns UK six times in the array
+// @param {[geolocations]}		geolocations 	The geolocations to be expanded
+// @return {[{geolocations}]}					The expanded geolocations
+let expand_geolocations = (geolocations) => {
+	let expanded_geolocations = []
+	for (let geolocation of geolocations) {
+		let exp_geo = Array.apply(null, Array(geolocation.count)).map(_ => geolocation);
+		expanded_geolocations.push(...exp_geo);
+	}
+	return expanded_geolocations;
+}
+
+// https://stackoverflow.com/questions/6671183/calculate-the-center-point-of-multiple-latitude-longitude-coordinate-pairs
+// @param [{"lat": .., "lng": ...}]	geolocations	The array of lat_lng objects
+// @return {[lat, lng]}								The calculated centerpoint	
+let get_lat_lng_center = (geolocations) => {
+	let sumX = 0;
+	let sumY = 0;
+	let sumZ = 0;
+
+	for (let geolocation of geolocations) {
+		let lat = deg_to_rad(geolocation["lat"]);
+		let lng = deg_to_rad(geolocation["lng"]);
+		// sum of cartesian coordinates
+		sumX += Math.cos(lat) * Math.cos(lng);
+		sumY += Math.cos(lat) * Math.sin(lng);
+		sumZ += Math.sin(lat);
+	}
+
+	let avgX = sumX / geolocations.length;
+	let avgY = sumY / geolocations.length;
+	let avgZ = sumZ / geolocations.length;
+
+	// convert average x, y, z coordinate to latitude and longtitude
+	let lng = Math.atan2(avgY, avgX);
+	let hyp = Math.sqrt(avgX * avgX + avgY * avgY);
+	let lat = Math.atan2(avgZ, hyp);
+
+	return ([rad_to_deg(lat), rad_to_deg(lng)]);
+}
 
 // Replaces all unsafe links with https:// links. 
 // Works for these sources, otherwise probaby not a good idea
@@ -600,5 +819,5 @@ if (typeof Element.prototype.clearChildren === 'undefined') {
 // @param 	{node}		new_node 			The reference node
 let insertAfter = (new_node, reference_node) => {
 	reference_node.parentNode.insertBefore(new_node,
-										   reference_node.nextSibling);
+		reference_node.nextSibling);
 }

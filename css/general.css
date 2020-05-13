@@ -2,21 +2,19 @@
 .headline-card {
 	transition: box-shadow 0.15s ease-in-out;
 	/*background-color: rgba(243, 165, 115, 0.1)*/
+}
+
+.headline {
 	cursor: pointer;
 }
 
-.headline-card.showing {
-	cursor: default;
+.headline.showing {
+	cursor: initial;
 }
 
 .headline-card:hover {
 	box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .17) !important;
 	transition: box-shadow 0.15s ease-in-out;
-}
-
-.headline-card.focus {
-	/*box-shadow: 0 .5rem 1rem rgb(243, 165, 115, 0.2) !important;*/
-	box-shadow: 0px 0px 20px 0px rgba(243, 165, 115, 0.50) !important;
 }
 
 .headline-card-body {
@@ -33,15 +31,40 @@
 	border-top: 1px solid lightgray;
 }
 
+.headline-badges > .badge {
+	margin-top: 2.5px;
+	margin-right: 6px;
+	margin-bottom: 2.5px;
+	margin-left: -2px;
+	color: black;
+	font-size: 8pt;
+	font-weight: 600;
+}
+.badge-point {
+	background-color: rgba(244, 165, 109, 1);
+}
+.badge-country {
+	background-color: rgba(244, 165, 109, 0.35);;	
+}
+
+
 .headline-content {
 	max-height: 0px;
 	margin-top: 5px;
-	visibility: hidden;
+	overflow: hidden;
 	transition: max-height 0.5s ease-in-out;
 }
 
+.headline-content a {
+	margin-left: -2px;
+	padding: 2px;
+
+	text-decoration: underline;
+	font-weight: 600;
+	font-size: 8pt;
+}
+
 .headline.showing .headline-content {
-	visibility: visible;
 	padding-bottom: 5px;
 	overflow: scroll;
 	transition: max-height 0.5s ease-in-out;
@@ -53,12 +76,9 @@
 	transition: none;
 }
 
-.headline-card.focus .headline-info {
-	border-top: 1px solid #f4a56d;
-}
-
 .headline-title {
 	font-weight: 500;
+	margin-right: 15px;
 }
 
 .headline-date {}
@@ -68,6 +88,18 @@
 	font-size: 8pt;
 }
 
+.headline .close {
+	display: none;
+}
+.headline.showing .close {
+	display: initial;
+	right: 15px;
+	top: 10px;
+	position: absolute;
+	color: rgb(160, 160, 160);
+	font-size: 12pt;
+}
+
 .headline-source {
 	flex: 1;
 }
@@ -75,14 +107,16 @@
 
 /*>>> DROPDOWN STYLING*/
 .dropdown {
-	background-color: #f4a56d !important;
-	border-color: #f4a56d !important;
+	color: black;
+	background-color: rgba(244, 165, 109, 1) !important;
+	border-color: rgba(244, 165, 109, 1) !important;
 }
 
 .dropdown:hover,
 .dropdown:active,
 .dropdown:visited,
 .dropdown:focus {
+	color: black;
 	background-color: rgb(233, 155, 105) !important;
 	border-color: rgb(233, 155, 105) !important;
 }
@@ -98,7 +132,7 @@
 }
 
 .dropdown-item.selected {
-	background-color: lightgray;
+	background-color: rgba(244, 165, 109, 0.5);
 }
 
 .dropdown-item {
