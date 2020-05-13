@@ -31,8 +31,36 @@ if (user_mobile && width < 1000) {
 		<div id="top-bar">
 			<div id="top-bar-logo">
 				<img src="images/mapnewslogo.png">
+				<span>Mapnews.io</span>
 			</div>
-			<div id="top-bar-selector">
+			<div id="top-bar-selectors">
+				<button id="top-bar-sourceselector" type="button" class="btn btn-primary dropdown">
+					<div href="#" data-toggle="dropdown" class="dropdown-toggle">Sources
+						<b class="caret"></b>
+					</div>
+					<div id="dropdown-items" class="dropdown-menu shadow-sm">
+						<a class="dropdown-item selected" id="dropdown_bbc" onclick="toggle_provider(this)">BBC</a>
+						<a class="dropdown-item selected" id="dropdown_nyt" onclick="toggle_provider(this)">The New York Times</a>
+						<a class="dropdown-item selected" id="dropdown_tg" onclick="toggle_provider(this)">The Guardian</a>
+						<a class="dropdown-item selected" id="dropdown_r" onclick="toggle_provider(this)">Reuters</a>
+						<a class="dropdown-item selected" id="dropdown_lat" onclick="toggle_provider(this)">Los Angeles Times</a>
+					</div>
+				</button>
+				<div id="top-bar-searchbar" class="input-group">
+					<div class="input-group-prepend">
+						<span class="input-group-text" id="basic-addon1">
+							<i class="fas fa-search"></i>
+						</span>
+					</div>
+					<input id="search" type="text" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="basic-addon1" oninput="search(this)">
+				</div>
+			</div>
+		</div>
+		<!-- 			<div id="top-bar-logo">
+				<img src="images/mapnewslogo.png">
+				<div id="logo-text">Mapnews.io</div>
+			</div> -->
+		<!-- 			<div id="top-bar-selector">
 				<button id="top-bar-sourceselector" type="button" class="btn btn-primary dropdown">
 					<div href="#" data-toggle="dropdown" class="dropdown-toggle">Sources
 						<b class="caret"></b>
@@ -53,8 +81,8 @@ if (user_mobile && width < 1000) {
 					</div>
 					<input id="search" type="text" class="form-control" placeholder="Search regex" aria-label="Search" aria-describedby="basic-addon1" oninput="search(this)">
 				</div>
-			</div>
-		</div>
+			</div> -->
+		<!-- </div> -->
 		<div id="headlines_container">
 			<div id="headlines">
 			</div>

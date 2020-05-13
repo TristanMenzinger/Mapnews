@@ -361,8 +361,9 @@ class Headline {
 			}
 			badge.textContent = geolocation.name;
 			badge.onclick = (event) => {
+				if(this.is_focus)
+					event.stopPropagation();
 				MAP.setCenterAnimated(new mapkit.Coordinate(geolocation.lat, geolocation.lng), false);
-				event.stopPropagation();
 			}
 			dom_badges.appendChild(badge)
 		}

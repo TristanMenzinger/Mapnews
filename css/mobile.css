@@ -116,6 +116,7 @@ body {
 
 #source-selector>button.selected {
     background-color: rgb(235, 131, 40);
+    border-color: rgb(235, 131, 40);
     color: black;
 }
 
@@ -130,3 +131,46 @@ body {
 #top-bar-searchbar>input {
     font-size: 14pt;
 }
+
+#about {
+    margin-top: auto;
+    font-size: 10pt;
+    padding-bottom: 10px;
+    border-bottom: 1px solid lightgray;
+}
+
+#credits {
+    margin-top: 10px;
+    font-size: 10pt;
+}
+
+#credits > a, #about > a {
+    color: rgb(1, 1, 1);
+    text-decoration: underline;
+}
+
+#credits > img, #about > img {
+    height: 20px;
+    -webkit-filter: grayscale(1);
+    filter: grayscale(1);
+}
+
+
+#logo {
+    position: absolute;
+    z-index: 10000;
+    
+    margin: 0.5em;
+    padding: 5px;
+    height: 35px;
+    font-weight: 600;
+}
+#logo > img {
+    height: 100%;
+    margin-right: 0.25em;
+}
+
+
+
+
+

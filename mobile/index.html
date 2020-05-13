@@ -30,6 +30,10 @@
 	<div id="scrolling-wrapper">
 		<div id="top-part">
 			<div class="rel-wrapper">
+				<div id="logo">
+					<img src="../images/mapnewslogo.png">
+					Mapnews.io
+				</div>
 				<div id="map"></div>
 				<div id="headlines_container">
 					<div id="headlines">
@@ -44,7 +48,7 @@
 						<i class="fas fa-search"></i>
 					</span>
 				</div>
-				<input id="search" type="text" class="form-control" placeholder="Search for Names or Places(Regex)" aria-label="Search" aria-describedby="basic-addon1" oninput="search(this)">
+				<input id="search" type="text" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="basic-addon1" oninput="search(this)">
 			</div>
 			<div id="source-selector">
 				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_bbc" onclick="toggle_provider(this)">BBC</button>
@@ -53,84 +57,18 @@
 				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_r" onclick="toggle_provider(this)">Reuters</button>
 				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_lat" onclick="toggle_provider(this)">Los Angeles Times</button>
 			</div>
+			<div id="about">
+				<img src="../images/github.svg">
+				Check out the project on <a target="_blank" rel="noopener noreferrer" href="https://bbc.com">GitHub</a> 
+				or <a target="_blank" rel="noopener noreferrer" href="https://github.com/TristanMenzinger">get in touch</a>.
+			</div>
+			<div id="credits">
+				<img src="../images/rss.svg">
+				All News collected via RSS from the <a target="_blank" rel="noopener noreferrer" href="https://bbc.com">BBC</a>, <a target="_blank" rel="noopener noreferrer" href="https://nytimes.com">The New York Times</a>, <a target="_blank" rel="noopener noreferrer" href="https://bbc.com">The Guardian</a>, <a target="_blank" rel="noopener noreferrer" href="https://reuters.com">Reuters</a> and <a target="_blank" rel="noopener noreferrer" href="https://latimes.com">The Los Angeles Times</a>.
+			</div>
 		</div>
 	</div>
-	<!-- 		<div id="container">
-		<div id="top-part">
-			Hello!
-			<div id="map"></div>
-			<div id="headlines_container">
-				<div id="headlines">
-				</div>
-			</div>
-		</div>
-		<div id="bottom-part">
-			Hello
-		</div>
-	</div> -->
-	<!-- 	<div id="filter">
-		</div>
-		<div id="test2">Lol</div>
-	</div> -->
-	<!--  <div id="filter"> -->
-	<!-- <div id="a"> -->
-	<!-- <div id="map"></div> -->
-	<!-- 			<div id="headlines_container">
-				<div id="headlines">
-				</div>
-			</div> -->
-	<!-- </div> -->
-	<!-- <div id="b"> -->
-	<!-- Hello -->
-	<!-- </div> -->
-	<!-- <div id="headlines_container"> -->
-	<!-- <div id="headlines"> -->
-	<!-- </div> -->
-	<!-- </div> -->
-	<!-- <div id="filter-selector">	 -->
-	<!-- </div> -->
-	<!-- </div> -->
-	<!-- div id="bar-left" class="">
-		<div id="top-bar">
-			<div id="top-bar-logo">
-				<img src="images/mapnewslogo.png">
-			</div>
-			<div id="top-bar-selector">
-				<button id="top-bar-sourceselector" type="button" class="btn btn-primary dropdown">
-					<div href="#" data-toggle="dropdown" class="dropdown-toggle">Sources
-						<b class="caret"></b>
-					</div>
-					<div id="dropdown-items" class="dropdown-menu shadow-sm">
-						<a class="dropdown-item selected" id="dropdown_bbc" onclick="toggle_provider(this)">BBC</a>
-						<a class="dropdown-item selected" id="dropdown_nyt" onclick="toggle_provider(this)">The New York Times</a>
-						<a class="dropdown-item selected" id="dropdown_tg" onclick="toggle_provider(this)">The Guardian</a>
-						<a class="dropdown-item selected" id="dropdown_r" onclick="toggle_provider(this)">Reuters</a>
-						<a class="dropdown-item selected" id="dropdown_lat" onclick="toggle_provider(this)">Los Angeles Times</a>
-					</div>
-				</button>
-				<div id="top-bar-searchbar" class="input-group mb-3">
-					<div class="input-group-prepend">
-						<span class="input-group-text" id="basic-addon1">
-							<i class="fas fa-search"></i>
-						</span>
-					</div>
-					<input id="search" type="text" class="form-control" placeholder="Search regex" aria-label="Search" aria-describedby="basic-addon1" oninput="search(this)">
-				</div>
-			</div>
-		</div>
-		<div id="headlines_container">
-			<div id="headlines">
-			</div>
-		</div>
-		<div id="headlines-navigation">
-			<nav aria-label="Page navigation example">
-				<ul class="pagination">
-					<li class="page-item page-prev" id="pagination-start"><a class="page-link" href="#" onclick="switch_to_page(CURRENT_PAGE-1)"><i class="fas fa-backward"></i></a></li>
-					<li class="page-item page-next"><a class="page-link" href="#" onclick="switch_to_page(CURRENT_PAGE+1)"><i class="fas fa-forward"></i></a></li>
-				</ul>
-			</nav>
-		</div>
-	</div> -->
+	
 </body>
 
 </html>
