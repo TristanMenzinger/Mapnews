@@ -83,14 +83,14 @@ body {
 }
 
 #top-bar-logo {
-    flex-basis: 4em;
+    flex-basis: 3em;
     flex-grow: 0;
     flex-shrink: 0;
 
     display: flex;
     flex-direction: row;
-
-    height: 2em;
+    margin-top: -0.2em;
+    margin-bottom: 0.5em;
 }
 #top-bar-logo img {
     flex-basis: 40px;
