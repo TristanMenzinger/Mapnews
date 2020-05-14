@@ -7,6 +7,8 @@ body {
 
 .headline {
     scroll-snap-align: start;
+    scroll-snap-stop: always;
+
     display: inline-block;
     width: 100%;
     white-space: initial;
@@ -53,6 +55,7 @@ body {
     overflow-y: hidden;
     white-space: nowrap;
     scroll-snap-type: x mandatory;
+    scroll-snap-stop: always;
 }
 
 #scrolling-wrapper {
