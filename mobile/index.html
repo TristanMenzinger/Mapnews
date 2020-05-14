@@ -1,74 +1,85 @@
 <html>
 
 <head>
-	<meta charset="utf-8">
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-	<script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
-
-	<script src="../js/main.js"></script>
-	<link rel="stylesheet" href="../css/general.css" />
-	<link rel="stylesheet" href="../css/mobile.css" />
-
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
+    <script src="../js/main.js"></script>
+    <link rel="stylesheet" href="../css/general.css" />
+    <link rel="stylesheet" href="../css/mobile.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-
 <script type="text/javascript">
-	const user_mobile = (navigator.userAgent.match(/Android/i) ||
-						 navigator.userAgent.match(/webOS/i) ||
-						 navigator.userAgent.match(/iPhone/i) ||
-						 navigator.userAgent.match(/iPod/i) ||
-						 navigator.userAgent.match(/BlackBerry/i) ||
-						 navigator.userAgent.match(/Windows Phone/i));
-	const width  = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-	if (!user_mobile || width > 1000) {
-		document.location = "../index.html";
-	}
+const user_mobile = (navigator.userAgent.match(/Android/i) ||
+    navigator.userAgent.match(/webOS/i) ||
+    navigator.userAgent.match(/iPhone/i) ||
+    navigator.userAgent.match(/iPod/i) ||
+    navigator.userAgent.match(/BlackBerry/i) ||
+    navigator.userAgent.match(/Windows Phone/i));
+const width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+if (!user_mobile || width > 1000) {
+    document.location = "../index.html";
+}
 </script>
 
 <body onload="init(true)">
-	<div id="scrolling-wrapper">
-		<div id="top-part">
-			<div class="rel-wrapper">
-				<div id="logo">
-					<img src="../images/mapnewslogo.png">
-					Mapnews.io
-				</div>
-				<div id="map"></div>
-				<div id="headlines_container">
-					<div id="headlines">
-					</div>
-				</div>
-			</div>
-		</div>
-		<div id="bottom-part">
-			<div id="top-bar-searchbar" class="input-group mb-3">
-				<div class="input-group-prepend">
-					<span class="input-group-text" id="basic-addon1">
-						<i class="fas fa-search"></i>
-					</span>
-				</div>
-				<input id="search" type="text" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="basic-addon1" oninput="search(this)">
-			</div>
-			<div id="source-selector">
-				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_bbc" onclick="toggle_provider(this)">BBC</button>
-				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_nyt" onclick="toggle_provider(this)">The New York Times</button>
-				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_tg" onclick="toggle_provider(this)">The Guardian</button>
-				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_r" onclick="toggle_provider(this)">Reuters</button>
-				<button type="button" class="btn btn-outline-secondary selected" id="dropdown_lat" onclick="toggle_provider(this)">Los Angeles Times</button>
-			</div>
-			<div id="about">
-				<img src="../images/github.svg">
-				Check out the project on <a target="_blank" rel="noopener noreferrer" href="https://bbc.com">GitHub</a> 
-				or <a target="_blank" rel="noopener noreferrer" href="https://github.com/TristanMenzinger">get in touch</a>.
-			</div>
-			<div id="credits">
-				<img src="../images/rss.svg">
-				All News collected via RSS from the <a target="_blank" rel="noopener noreferrer" href="https://bbc.com">BBC</a>, <a target="_blank" rel="noopener noreferrer" href="https://nytimes.com">The New York Times</a>, <a target="_blank" rel="noopener noreferrer" href="https://bbc.com">The Guardian</a>, <a target="_blank" rel="noopener noreferrer" href="https://reuters.com">Reuters</a> and <a target="_blank" rel="noopener noreferrer" href="https://latimes.com">The Los Angeles Times</a>.
-			</div>
-		</div>
-	</div>
-	
+    <div id="explanation-overlay" class="">
+        <div id="explanation-close">
+        	<span aria-hidden="true">&times;</span>
+        </div>
+        <div id="explanation-swipe-up">
+            <img src="../images/swipe_up.png" />
+            Swipe up
+            <br>for the menu and information.
+        </div>
+        <div id="explanation-swipe-side">
+            <img src="../images/swipe_left.png" />
+            <span>Swipe to the side <br> to see headlines</span>
+            <img src="../images/swipe_right.png" />
+        </div>
+    </div>
+    <div id="scrolling-wrapper">
+        <div id="top-part">
+            <div class="rel-wrapper">
+                <div id="logo">
+                    <img src="../images/mapnewslogo.png" />
+                    Mapnews.io
+                </div>
+                <div id="map"></div>
+                <div id="headlines_container">
+                    <div id="headlines">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="bottom-part">
+            <div id="top-bar-searchbar" class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">
+                        <i class="fas fa-search"></i>
+                    </span>
+                </div>
+                <input id="search" type="text" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="basic-addon1" oninput="search(this)">
+            </div>
+            <div id="source-selector">
+                <button type="button" class="btn btn-outline-secondary selected" id="dropdown_bbc" onclick="toggle_provider(this)">BBC</button>
+                <button type="button" class="btn btn-outline-secondary selected" id="dropdown_nyt" onclick="toggle_provider(this)">The New York Times</button>
+                <button type="button" class="btn btn-outline-secondary selected" id="dropdown_tg" onclick="toggle_provider(this)">The Guardian</button>
+                <button type="button" class="btn btn-outline-secondary selected" id="dropdown_r" onclick="toggle_provider(this)">Reuters</button>
+                <button type="button" class="btn btn-outline-secondary selected" id="dropdown_lat" onclick="toggle_provider(this)">Los Angeles Times</button>
+            </div>
+            <div id="about">
+                <img src="../images/github.svg">
+                Check out the project on <a target="_blank" rel="noopener noreferrer" href="https://bbc.com">GitHub</a>
+                or <a target="_blank" rel="noopener noreferrer" href="https://github.com/TristanMenzinger">get in touch</a>.
+            </div>
+            <div id="credits">
+                <img src="../images/rss.svg">
+                All News collected via RSS from the <a target="_blank" rel="noopener noreferrer" href="https://bbc.com">BBC</a>, <a target="_blank" rel="noopener noreferrer" href="https://nytimes.com">The New York Times</a>, <a target="_blank" rel="noopener noreferrer" href="https://bbc.com">The Guardian</a>, <a target="_blank" rel="noopener noreferrer" href="https://reuters.com">Reuters</a> and <a target="_blank" rel="noopener noreferrer" href="https://latimes.com">The Los Angeles Times</a>.
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

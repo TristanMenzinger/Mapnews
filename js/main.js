@@ -68,6 +68,16 @@ let IS_MOBILE;
 let init = async (is_mobile) => {
 	IS_MOBILE = is_mobile;
 
+	if(IS_MOBILE) {
+		if(get_set_visited_previously()) {
+			document.getElementById("explanation-overlay").classList.add("hide");
+		}else {
+			document.getElementById("explanation-close").onclick = () => {
+				document.getElementById("explanation-overlay").classList.add("hide");
+			}
+		}
+	}
+
 	// Fetch all headlines
 	let all_headlines = await get_headlines();
 	for (let raw_headline of all_headlines) {
@@ -702,6 +712,16 @@ let get_shapefile_wcache = async (name) => {
 // --------------------------------------------------------------------------------------------------
 // Polyfills & Helpers.
 // --------------------------------------------------------------------------------------------------
+
+let get_set_visited_previously = () => {
+	const visited_previously = localStorage.getItem('has_visited_previously');
+	if(visited_previously) {
+		return true;
+	}else {
+		localStorage.setItem('has_visited_previously', 'true');
+		return false;
+	}
+}
 
 let clear_map = () => {
 	MAP.removeAnnotations(MAP.annotations)
