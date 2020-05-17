@@ -73,7 +73,7 @@ let init = async (is_mobile) => {
 		if(localStorage.getItem('has_visited_previously')) {
 			document.getElementById("explanation-overlay").classList.add("hide");
 		}else {
-			localStorage.getItem('has_visited_previously') = "true";
+			localStorage.setItem('has_visited_previously', "true");
 			document.getElementById("explanation-close").onclick = () => {
 				document.getElementById("explanation-overlay").classList.add("hide");
 			}

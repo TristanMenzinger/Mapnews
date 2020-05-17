@@ -39,6 +39,15 @@
 	color: black;
 	font-size: 8pt;
 	font-weight: 600;
+
+	cursor: pointer;
+
+	-webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 .badge-point {
 	background-color: rgba(244, 165, 109, 1);

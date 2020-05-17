@@ -28,7 +28,7 @@ body {
 
 .headline.showing .headline-content {
     visibility: visible;
-    max-height: 65vh;
+    max-height: 55vh;
 }
 
 .headline-info {
