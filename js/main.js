@@ -7,7 +7,7 @@ let PAGES = null;
 let SELECTED_PAGINATION_DIV = null;
 
 // Global variable containing all Headlines
-let ALL_HEADLINES = [];
+let ALL_HEADLINES  = [];
 
 let SHAPEFILE_CACHE = {};
 
@@ -68,14 +68,41 @@ let IS_MOBILE;
 let init = async (is_mobile) => {
 	IS_MOBILE = is_mobile;
 
+	// Check whether we should show the explanatory overlay
 	if(IS_MOBILE) {
-		if(get_set_visited_previously()) {
+		if(localStorage.getItem('has_visited_previously')) {
 			document.getElementById("explanation-overlay").classList.add("hide");
 		}else {
+			localStorage.getItem('has_visited_previously') = "true";
 			document.getElementById("explanation-close").onclick = () => {
 				document.getElementById("explanation-overlay").classList.add("hide");
 			}
 		}
+	}
+
+
+	let news_source_preferences = localStorage.getItem('preferences_news_sources');
+	try {
+		news_source_preferences = JSON.parse(news_source_preferences);
+	}catch {
+		news_source_preferences = null;
+	}
+	// If there are stored news source preferences AND if they haven't been updated
+	if( news_source_preferences && Object.keys(news_source_preferences).toString() === Object.keys(NEWS_SOURCES).toString()) {
+		NEWS_SOURCES = news_source_preferences;
+	}
+
+
+	// Check previously stored news sources preferences
+	for(let source of Object.keys(NEWS_SOURCES)){
+		if(localStorage.getItem('sources'))
+		console.log(NEWS_SOURCES[source]);
+	}
+
+	// Adjust selection of news sources
+	for(let source of Object.keys(NEWS_SOURCES)){
+		if(NEWS_SOURCES[source]["selected"])
+			document.getElementById("dropdown_"+source).classList.add("selected");
 	}
 
 	// Fetch all headlines
@@ -88,6 +115,7 @@ let init = async (is_mobile) => {
 	MAP = initialize_map();
 
 	// Update the headlines in view
+	apply_filters();
 	update_shown_headlines();
 
 	// Initialize
@@ -192,7 +220,11 @@ let search = (search_div) => {
 let toggle_provider = (clicked_dropdown) => {
 	selected_source = clicked_dropdown.id.replace("dropdown_", "");
 	clicked_dropdown.classList.toggle("selected");
+	console.log(selected_source);
 	NEWS_SOURCES[selected_source].selected = !NEWS_SOURCES[selected_source].selected;
+
+	// Save in localstorage
+	localStorage.setItem('preferences_news_sources', JSON.stringify(NEWS_SOURCES))
 
 	apply_filters();
 	update_shown_headlines();
@@ -228,6 +260,9 @@ let update_shown_headlines = () => {
 			div_all_headlines.appendChild(fill_nothing_found_template(MOBILE_NOTHING_FOUND));
 		else
 			div_all_headlines.appendChild(fill_nothing_found_template(DESKTOP_NOTHING_FOUND));
+	} else {
+		if (IS_MOBILE)
+			ALL_HEADLINES.filter(h => h.is_show)[0].show_markers(true);
 	}
 }
 
@@ -712,16 +747,6 @@ let get_shapefile_wcache = async (name) => {
 // --------------------------------------------------------------------------------------------------
 // Polyfills & Helpers.
 // --------------------------------------------------------------------------------------------------
-
-let get_set_visited_previously = () => {
-	const visited_previously = localStorage.getItem('has_visited_previously');
-	if(visited_previously) {
-		return true;
-	}else {
-		localStorage.setItem('has_visited_previously', 'true');
-		return false;
-	}
-}
 
 let clear_map = () => {
 	MAP.removeAnnotations(MAP.annotations)
