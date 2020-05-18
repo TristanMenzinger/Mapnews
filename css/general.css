@@ -61,7 +61,7 @@
 	max-height: 0px;
 	margin-top: 5px;
 	overflow: hidden;
-	transition: max-height 0.5s ease-in-out;
+	transition: max-height 0.35s ease-in-out;
 }
 
 .headline-content a {
@@ -76,7 +76,7 @@
 .headline.showing .headline-content {
 	padding-bottom: 5px;
 	overflow: scroll;
-	transition: max-height 0.5s ease-in-out;
+	transition: max-height 0.35s ease-in-out;
 }
 .headline.instant .headline-content {
 	transition: none;

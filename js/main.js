@@ -45,14 +45,6 @@ let SANE_COUNTRY_NAMES = {
 	"Uk": "United Kingdom"
 }
 
-// Scrolling wizardry
-let scroll_timeout;
-let is_scrolling = false;
-
-// Represents the last headline that was in view
-// let LAST_HL_IN_VIEW = null;
-// let LAST_HL_IN_VIEW_INDEX = null;
-
 // Error messages 
 const MOBILE_NOTHING_FOUND = "Swipe up from here to adjust your filters.";
 const DESKTOP_NOTHING_FOUND = "Please adjust your filters and search.";
@@ -115,17 +107,22 @@ let init = async (is_mobile) => {
 	apply_filters();
 	update_shown_headlines();
 
-	// Initialize
-	initialize_scroll_listener();
+	if(IS_MOBILE) {
+		// Initialize the "Glider" library for sidescrolling
+		initialize_scroll_listener();
+	}
 
 	// Initialize the map
 	MAP = initialize_map();
 }
 
+// Unlimit the headline card container's max height
 let disable_glider_mh = () => {
 	document.querySelector('.glider-track').style.maxHeight = "9999px";
 }
 
+// Limit the headline card container's max height
+// @param 	{float}				The max height of the headline container 
 let set_glider_max_height = (max_height) => {
 	document.querySelector('.glider-track').style.maxHeight = (max_height+10)+"px";
 }
@@ -162,54 +159,6 @@ let initialize_scroll_listener = () => {
 		set_glider_max_height(headline.div_card.offsetHeight);
 		headline.show_markers(true);
 	})
-
-	// LAST_HL_IN_VIEW = ALL_HEADLINES.filter(h => h.is_show)[0];
-	// LAST_HL_IN_VIEW_INDEX = 0;
-
-	// if (IS_MOBILE) {
-	// 	let div_headlines = document.getElementById("headlines");
-
-	// 	div_headlines.onscroll = (event) => {
-
-	// 		if (!is_scrolling) {
-	// 			is_scrolling = true;
-	// 			console.log("Scroll started");
-
-	// 			// Reset their un-force-minimized state, but do so instantly without the animation
-	// 			ALL_HEADLINES.filter(h => h != LAST_HL_IN_VIEW).map(h => h.reset_from_state(true));
-
-	// 			ALL_HEADLINES.map(h => h.div.style.maxHeight = "none");
-	// 		}
-
-	// 		window.clearTimeout(scroll_timeout);
-	// 		scroll_timeout = setTimeout(function() {
-
-	// 			// Get the headline in view
-	// 			let in_view = ALL_HEADLINES.filter(x => x.in_view() && x.is_show)
-	// 			let in_view_len = in_view.length
-	// 			in_view = in_view[0]
-
-	// 			// Check if one is completely in view
-	// 			if (in_view_len == 1) {
-	// 				console.log('Scrolling has stopped.');
-	// 				is_scrolling = false;
-
-	// 				if (LAST_HL_IN_VIEW != in_view) {
-
-	// 					LAST_HL_IN_VIEW = in_view;
-	// 					LAST_HL_IN_VIEW.show_markers(true);
-
-	// 					// Force minimize all headlines around.
-	// 					ALL_HEADLINES.filter(h => h != LAST_HL_IN_VIEW).map(h => h.minimize(true))
-
-	// 					let height = LAST_HL_IN_VIEW.div.getBoundingClientRect().height;
-	// 					ALL_HEADLINES.map(h => h.div.style.maxHeight = height + "px");
-	// 					LAST_HL_IN_VIEW.div.style.maxHeight = "none";
-	// 				}
-	// 			}
-	// 		}, 30);
-	// 	};
-	// }
 }
 
 // Initialize the map
@@ -312,7 +261,6 @@ let apply_filters = (search_string) => {
 	}
 }
 
-
 // Split the headlines which have the is_show attribute set to true into pages
 // @return 	{json}							The pages as a json object where pages[1] is the first page
 let headlines_to_pages = () => {
@@ -407,7 +355,7 @@ class Headline {
 
 		this._make_div();
 		this._add_onclick_listeners();
-		this._add_onswipe_listener();
+		// this._add_onswipe_listener();
 	}
 
 	// Sanitizes the geolocation names according to the global JSON with information about unified 
@@ -463,71 +411,70 @@ class Headline {
 		}
 	}
 
-	_add_onswipe_listener() {
+	// DEPRECATED
+	// _add_onswipe_listener() {
+	// 	//this.div.addEventListener('touchstart', handleTouchStart, false);
+	// 	//this.div.addEventListener('touchmove', handleTouchMove, false);
+	// 	var xDown = null;
+	// 	var yDown = null;
+	// 	this.div.ontouchstart = (evt) => {
+	// 		const firstTouch = evt.touches[0];
+	// 		xDown = firstTouch.clientX;
+	// 		yDown = firstTouch.clientY;
+	// 	}
+	// 	this.div.ontouchmove = (evt) => {
+	// 		if (!xDown || !yDown) {
+	// 			return;
+	// 		}
+	// 		var xUp = evt.touches[0].clientX;
+	// 		var yUp = evt.touches[0].clientY;
+	// 		var xDiff = xDown - xUp;
+	// 		var yDiff = yDown - yUp;
+	// 		if (Math.abs(xDiff) > Math.abs(yDiff)) { /*most significant*/
+	// 			if (xDiff > 0) {
+	// 				/* left swipe */
+	// 				// console.log("left swipe");
+	// 			} else {
+	// 				/* right swipe */
+	// 				// console.log("right swipe");
+	// 			}
+	// 		} else {
+	// 			console.log(Math.abs(yDiff) / this.div.offsetHeight)
+	// 			if (Math.abs(yDiff) / this.div.offsetHeight > 0.1) {
+	// 				if (yDiff > 0) {
+	// 					// console.log("up swipe");
+	// 				} else {
+	// 					console.log("down swipe");
+	// 					this.remove_from_view()
+	// 				}
+	// 			}
+	// 		}
+	// 		/* reset values */
+	// 		xDown = null;
+	// 		yDown = null;
+	// 	};
+	// }
 
-		//this.div.addEventListener('touchstart', handleTouchStart, false);
-		//this.div.addEventListener('touchmove', handleTouchMove, false);
-
-		var xDown = null;
-		var yDown = null;
-
-		this.div.ontouchstart = (evt) => {
-			const firstTouch = evt.touches[0];
-			xDown = firstTouch.clientX;
-			yDown = firstTouch.clientY;
-		}
-
-		this.div.ontouchmove = (evt) => {
-			if (!xDown || !yDown) {
-				return;
-			}
-
-			var xUp = evt.touches[0].clientX;
-			var yUp = evt.touches[0].clientY;
-
-			var xDiff = xDown - xUp;
-			var yDiff = yDown - yUp;
-
-			if (Math.abs(xDiff) > Math.abs(yDiff)) { /*most significant*/
-				if (xDiff > 0) {
-					/* left swipe */
-					// console.log("left swipe");
-				} else {
-					/* right swipe */
-					// console.log("right swipe");
-				}
-			} else {
-				console.log(Math.abs(yDiff) / this.div.offsetHeight)
-				if (Math.abs(yDiff) / this.div.offsetHeight > 0.1) {
-					if (yDiff > 0) {
-						// console.log("up swipe");
-					} else {
-						console.log("down swipe");
-						this.remove_from_view()
-					}
-				}
-			}
-			/* reset values */
-			xDown = null;
-			yDown = null;
-		};
-	}
-
+	// Focus on this headline, adding an orange glow
 	focus() {
 		ALL_HEADLINES.map(h => h.unfocus());
 		this.is_focus = true;
 		this.div.classList.add("focus");
 	}
 
+	// Unfocus the headline
 	unfocus() {
 		this.is_focus = false;
 		this.div.classList.remove("focus");
 	}
 
+	// Return the height of the headline card
+	// @return {float}							The height of the card itself (.headline-card)
 	get_height() {
 		return this.div_card.offsetHeight;
 	}
 
+	// DEPRECATED
 	// Resets the headline's state to it's notated state (can be called to reverse it if the dom was mutated
 	// directly by calling expand or minimize with no_set = true)
 	// @param 	{bool} 		instant 			If true, the object is shown immediatly, skipping any animations
@@ -541,12 +488,13 @@ class Headline {
 	// Expands the headline
 	// @param 	{bool} 		no_set 				Whether to make this change persistent. If set to no, the object 
 	// 											can be reversed to its original state with reverse_from_state()
-	// @param 	{bool} 		instant 			If true, the object is shown immediatly, skipping any animations
 	expand(no_set) {
 		let content_div = this.div.querySelector(".headline-content")
 
-		// this sets the maximum height to unlimited, and this card can become the highest one
-		disable_glider_mh();
+		if(IS_MOBILE) {
+			// Set the maximum height to unlimited, and this card can expand to its full height.
+			disable_glider_mh();
+		}
 		this.div.classList.add("showing");
 
 		if (!no_set)
@@ -556,13 +504,15 @@ class Headline {
 	// Minimizes the headline
 	// @param 	{bool} 		no_set 				Whether to make this change persistent. If set to no, the object 
 	// 											can be reversed to its original state with reverse_from_state()
-	// @param 	{bool} 		instant 			If true, the object is shown immediatly, skipping any animations
 	minimize(no_set) {
 		let content_div = this.div.querySelector(".headline-content");
 
-		setTimeout(() => {
-			set_glider_max_height(this.get_height());
-		}, 500);
+		if(IS_MOBILE) {
+			// Set the maximum height to this card's height after a certain delay, allowing for the animation to finish.
+			setTimeout(() => {
+				set_glider_max_height(this.get_height());
+			}, 500);
+		}	
 		this.div.classList.remove("showing");
 		if (!no_set)
 			this.is_expanded = false;
@@ -688,7 +638,9 @@ let get_headlines = async () => {
 		})
 }
 
-
+// Fetches a shapefile with a given name
+// @param 	{String}	name 				The name of the shapefile
+// @return 	{Promise() => json}				The news data as a json object
 let get_shapefile = async (name) => {
 	return fetch("../countryshapes/" + name + ".js")
 		.then(response => response.json())
@@ -770,10 +722,11 @@ let fill_headline_template = (headline) => {
 }
 
 
-
+// Fetches the shapefile with the given name via HTTP or the cache
+// @param 	{String}	name 		The country's name
 let get_shapefile_wcache = async (name) => {
 	if (name in SHAPEFILE_CACHE) {
-		console.log("Serving Shapefile from Cache")
+		// console.log("Serving Shapefile from Cache")
 		return SHAPEFILE_CACHE[name];
 	} else {
 		SHAPEFILE_CACHE[name] = await get_shapefile(name);
@@ -786,6 +739,7 @@ let get_shapefile_wcache = async (name) => {
 // Polyfills & Helpers.
 // --------------------------------------------------------------------------------------------------
 
+// Clears the map of all overlays and annotations
 let clear_map = () => {
 	MAP.removeAnnotations(MAP.annotations)
 	MAP.removeOverlays(MAP.overlays)
