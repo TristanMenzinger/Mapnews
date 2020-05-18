@@ -162,18 +162,19 @@ let initialize_scroll_listener = () => {
 				if (in_view_len == 1) {
 					console.log('Scrolling has stopped.');
 					is_scrolling = false;
-					LAST_HL_IN_VIEW = in_view;
 
-					LAST_HL_IN_VIEW.show_markers(true);
+					if(LAST_HL_IN_VIEW != in_view) {
 
-					// Force minimize all headlines around.
-					// ALL_HEADLINES.filter(h => h != LAST_HL_IN_VIEW).map(h => h.minimize(true))
+						LAST_HL_IN_VIEW = in_view;
+						LAST_HL_IN_VIEW.show_markers(true);
 
-					let height = LAST_HL_IN_VIEW.div.getBoundingClientRect().height;
-					ALL_HEADLINES.map(h => h.div.style.maxHeight = height+"px");
-					LAST_HL_IN_VIEW.div.style.maxHeight = "none";
+						// Force minimize all headlines around.
+						// ALL_HEADLINES.filter(h => h != LAST_HL_IN_VIEW).map(h => h.minimize(true))
 
-
+						let height = LAST_HL_IN_VIEW.div.getBoundingClientRect().height;
+						ALL_HEADLINES.map(h => h.div.style.maxHeight = height+"px");
+						LAST_HL_IN_VIEW.div.style.maxHeight = "none";
+					}
 				}
 			}, 30);
 		};
@@ -631,6 +632,12 @@ class Headline {
 	// Checks if the Headline is in the viewport of the device (e.g. shown / currently focused)
 	// @return 	{bool}							Whether or not the Headline is in view	
 	in_view() {
+		if(this.div.getBoundingClientRect().x == 0) 
+			console.log("x", this.div.getBoundingClientRect())
+		
+		// if(this.div.getBoundingClientRect().y != 0) 
+			// console.log("y", this.div.getBoundingClientRect())
+		return Math.abs(this.div.getBoundingClientRect().x) < 3 && this.div.getBoundingClientRect().y != 0
 		return this.div.getBoundingClientRect().x == 0 && this.div.getBoundingClientRect().y != 0
 	}
 

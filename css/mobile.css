@@ -7,7 +7,7 @@ body {
 
 .headline {
     scroll-snap-align: start;
-    scroll-snap-stop: always;
+    /*scroll-snap-stop: always;*/
 
     display: inline-block;
     width: 100%;
@@ -55,7 +55,7 @@ body {
     overflow-y: hidden;
     white-space: nowrap;
     scroll-snap-type: x mandatory;
-    scroll-snap-stop: always;
+    /*scroll-snap-stop: always;*/
 }
 
 #scrolling-wrapper {
@@ -69,12 +69,14 @@ body {
 
 #top-part {
     height: 100%;
-    scroll-snap-align: center;
+    /*scroll-snap-align: center;*/
+    scroll-snap-align: left;
 }
 
 #bottom-part {
     height: 100%;
-    scroll-snap-align: center;
+    /*scroll-snap-align: center;*/
+    scroll-snap-align: left;
 }
 
 #headlines_container {
