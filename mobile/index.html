@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="../css/general.css" />
     <link rel="stylesheet" href="../css/mobile.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="../glider.js"></script>
+    <link rel="stylesheet" type="text/css" href="../glider.css">
 </head>
 <script type="text/javascript">
 const user_mobile = (navigator.userAgent.match(/Android/i) ||
@@ -49,7 +51,11 @@ if (!user_mobile || width > 1000) {
                     </div>
                     <div id="map"></div>
                     <div id="headlines_container">
-                        <div id="headlines">
+                        <!-- <div id="headlines">
+                        </div> -->
+                        <div id="glider-contain">
+                            <div class="glider" id="headlines">
+                            </div>
                         </div>
                     </div>
                 </div>

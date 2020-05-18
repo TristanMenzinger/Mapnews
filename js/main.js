@@ -7,7 +7,7 @@ let PAGES = null;
 let SELECTED_PAGINATION_DIV = null;
 
 // Global variable containing all Headlines
-let ALL_HEADLINES  = [];
+let ALL_HEADLINES = [];
 
 let SHAPEFILE_CACHE = {};
 
@@ -50,8 +50,8 @@ let scroll_timeout;
 let is_scrolling = false;
 
 // Represents the last headline that was in view
-let LAST_HL_IN_VIEW = null;
-let LAST_HL_IN_VIEW_INDEX = null;
+// let LAST_HL_IN_VIEW = null;
+// let LAST_HL_IN_VIEW_INDEX = null;
 
 // Error messages 
 const MOBILE_NOTHING_FOUND = "Swipe up from here to adjust your filters.";
@@ -69,10 +69,10 @@ let init = async (is_mobile) => {
 	IS_MOBILE = is_mobile;
 
 	// Check whether we should show the explanatory overlay
-	if(IS_MOBILE) {
-		if(localStorage.getItem('has_visited_previously')) {
+	if (IS_MOBILE) {
+		if (localStorage.getItem('has_visited_previously')) {
 			document.getElementById("explanation-overlay").classList.add("hide");
-		}else {
+		} else {
 			localStorage.setItem('has_visited_previously', "true");
 			document.getElementById("explanation-close").onclick = () => {
 				document.getElementById("explanation-overlay").classList.add("hide");
@@ -84,25 +84,25 @@ let init = async (is_mobile) => {
 	let news_source_preferences = localStorage.getItem('preferences_news_sources');
 	try {
 		news_source_preferences = JSON.parse(news_source_preferences);
-	}catch {
+	} catch {
 		news_source_preferences = null;
 	}
 	// If there are stored news source preferences AND if they haven't been updated
-	if( news_source_preferences && Object.keys(news_source_preferences).toString() === Object.keys(NEWS_SOURCES).toString()) {
+	if (news_source_preferences && Object.keys(news_source_preferences).toString() === Object.keys(NEWS_SOURCES).toString()) {
 		NEWS_SOURCES = news_source_preferences;
 	}
 
 
 	// Check previously stored news sources preferences
-	for(let source of Object.keys(NEWS_SOURCES)){
-		if(localStorage.getItem('sources'))
-		console.log(NEWS_SOURCES[source]);
+	for (let source of Object.keys(NEWS_SOURCES)) {
+		if (localStorage.getItem('sources'))
+			console.log(NEWS_SOURCES[source]);
 	}
 
 	// Adjust selection of news sources
-	for(let source of Object.keys(NEWS_SOURCES)){
-		if(NEWS_SOURCES[source]["selected"])
-			document.getElementById("dropdown_"+source).classList.add("selected");
+	for (let source of Object.keys(NEWS_SOURCES)) {
+		if (NEWS_SOURCES[source]["selected"])
+			document.getElementById("dropdown_" + source).classList.add("selected");
 	}
 
 	// Fetch all headlines
@@ -111,9 +111,6 @@ let init = async (is_mobile) => {
 		ALL_HEADLINES.push(new Headline(raw_headline))
 	}
 
-	// Initialize the map
-	MAP = initialize_map();
-
 	// Update the headlines in view
 	apply_filters();
 	update_shown_headlines();
@@ -121,6 +118,16 @@ let init = async (is_mobile) => {
 	// Initialize
 	initialize_scroll_listener();
 
+	// Initialize the map
+	MAP = initialize_map();
+}
+
+let disable_glider_mh = () => {
+	document.querySelector('.glider-track').style.maxHeight = "9999px";
+}
+
+let set_glider_max_height = (max_height) => {
+	document.querySelector('.glider-track').style.maxHeight = (max_height+10)+"px";
 }
 
 // This method initializes a listener on the container of the headlines. It serves the
@@ -132,53 +139,77 @@ let init = async (is_mobile) => {
 // and overflow-y to scroll, there's no way around it.
 // If there is, tell me....
 let initialize_scroll_listener = () => {
-	LAST_HL_IN_VIEW = ALL_HEADLINES.filter(h => h.is_show)[0];
-	LAST_HL_IN_VIEW_INDEX = 0;
+	new Glider(document.querySelector('.glider'), {
+		// Mobile-first defaults
+		slidesToShow: 1,
+		slidesToScroll: 1,
+		scrollLock: true,
+		duration: 0.4
+	});
 
-	if (IS_MOBILE) {
-		let div_headlines = document.getElementById("headlines");
 
-		div_headlines.onscroll = (event) => {
-
-			if (!is_scrolling) {
-				is_scrolling = true;
-				console.log("Scroll started");
-
-				// Reset their un-force-minimized state, but do so instantly without the animation
-				// ALL_HEADLINES.filter(h => h != LAST_HL_IN_VIEW).map(h => h.reset_from_state(true));
-
-				ALL_HEADLINES.map(h => h.div.style.maxHeight = "none");
-			}
-
-			window.clearTimeout(scroll_timeout);
-			scroll_timeout = setTimeout(function() {
-
-				// Get the headline in view
-				let in_view = ALL_HEADLINES.filter(x => x.in_view() && x.is_show)
-				let in_view_len = in_view.length
-				in_view = in_view[0]
-
-				// Check if one is completely in view
-				if (in_view_len == 1) {
-					console.log('Scrolling has stopped.');
-					is_scrolling = false;
-
-					if(LAST_HL_IN_VIEW != in_view) {
-
-						LAST_HL_IN_VIEW = in_view;
-						LAST_HL_IN_VIEW.show_markers(true);
-
-						// Force minimize all headlines around.
-						// ALL_HEADLINES.filter(h => h != LAST_HL_IN_VIEW).map(h => h.minimize(true))
-
-						let height = LAST_HL_IN_VIEW.div.getBoundingClientRect().height;
-						ALL_HEADLINES.map(h => h.div.style.maxHeight = height+"px");
-						LAST_HL_IN_VIEW.div.style.maxHeight = "none";
-					}
-				}
-			}, 30);
-		};
+	let cnt = 0;
+	document.querySelector('.glider').onscroll = () => {
+		cnt++;
+		if(cnt > 2) {
+			disable_glider_mh();
+		}
 	}
+
+	document.querySelector('.glider').addEventListener('glider-slide-visible', (event) => {
+		cnt = 0;
+		let headline = ALL_HEADLINES.filter(h => h.is_show)[event.detail.slide]
+		set_glider_max_height(headline.div_card.offsetHeight);
+		headline.show_markers(true);
+	})
+
+	// LAST_HL_IN_VIEW = ALL_HEADLINES.filter(h => h.is_show)[0];
+	// LAST_HL_IN_VIEW_INDEX = 0;
+
+	// if (IS_MOBILE) {
+	// 	let div_headlines = document.getElementById("headlines");
+
+	// 	div_headlines.onscroll = (event) => {
+
+	// 		if (!is_scrolling) {
+	// 			is_scrolling = true;
+	// 			console.log("Scroll started");
+
+	// 			// Reset their un-force-minimized state, but do so instantly without the animation
+	// 			ALL_HEADLINES.filter(h => h != LAST_HL_IN_VIEW).map(h => h.reset_from_state(true));
+
+	// 			ALL_HEADLINES.map(h => h.div.style.maxHeight = "none");
+	// 		}
+
+	// 		window.clearTimeout(scroll_timeout);
+	// 		scroll_timeout = setTimeout(function() {
+
+	// 			// Get the headline in view
+	// 			let in_view = ALL_HEADLINES.filter(x => x.in_view() && x.is_show)
+	// 			let in_view_len = in_view.length
+	// 			in_view = in_view[0]
+
+	// 			// Check if one is completely in view
+	// 			if (in_view_len == 1) {
+	// 				console.log('Scrolling has stopped.');
+	// 				is_scrolling = false;
+
+	// 				if (LAST_HL_IN_VIEW != in_view) {
+
+	// 					LAST_HL_IN_VIEW = in_view;
+	// 					LAST_HL_IN_VIEW.show_markers(true);
+
+	// 					// Force minimize all headlines around.
+	// 					ALL_HEADLINES.filter(h => h != LAST_HL_IN_VIEW).map(h => h.minimize(true))
+
+	// 					let height = LAST_HL_IN_VIEW.div.getBoundingClientRect().height;
+	// 					ALL_HEADLINES.map(h => h.div.style.maxHeight = height + "px");
+	// 					LAST_HL_IN_VIEW.div.style.maxHeight = "none";
+	// 				}
+	// 			}
+	// 		}, 30);
+	// 	};
+	// }
 }
 
 // Initialize the map
@@ -394,6 +425,7 @@ class Headline {
 	// Uses title, summary, surce and published (publish-date) as inputs.
 	_make_div() {
 		this.div = fill_headline_template(this);
+		this.div_card = this.div.querySelector(".headline-card");
 
 		let dom_badges = this.div.querySelector(".headline-badges")
 		for (let geolocation of this.geolocations) {
@@ -407,13 +439,12 @@ class Headline {
 			}
 			badge.textContent = geolocation.name;
 			badge.onclick = (event) => {
-				if(this.is_focus)
+				if (this.is_focus)
 					event.stopPropagation();
 				MAP.setCenterAnimated(new mapkit.Coordinate(geolocation.lat, geolocation.lng), false);
 			}
 			dom_badges.appendChild(badge)
 		}
-
 	}
 
 	// Adds an onclick listener to the headline card
@@ -493,29 +524,31 @@ class Headline {
 		this.div.classList.remove("focus");
 	}
 
+	get_height() {
+		return this.div_card.offsetHeight;
+	}
+
 	// Resets the headline's state to it's notated state (can be called to reverse it if the dom was mutated
 	// directly by calling expand or minimize with no_set = true)
 	// @param 	{bool} 		instant 			If true, the object is shown immediatly, skipping any animations
-	reset_from_state(instant) {
-		if (this.is_expanded)
-			this.expand(true, instant);
-		else
-			this.minimize(true, instant);
-	}
+	// reset_from_state(instant) {
+	// 	if (this.is_expanded)
+	// 		this.expand(true, instant);
+	// 	else
+	// 		this.minimize(true, instant);
+	// }
 
 	// Expands the headline
 	// @param 	{bool} 		no_set 				Whether to make this change persistent. If set to no, the object 
 	// 											can be reversed to its original state with reverse_from_state()
 	// @param 	{bool} 		instant 			If true, the object is shown immediatly, skipping any animations
-	expand(no_set, instant) {
+	expand(no_set) {
 		let content_div = this.div.querySelector(".headline-content")
 
-		if (instant)
-			this.div.classList.add("instant");
-		else
-			this.div.classList.remove("instant");
-
+		// this sets the maximum height to unlimited, and this card can become the highest one
+		disable_glider_mh();
 		this.div.classList.add("showing");
+
 		if (!no_set)
 			this.is_expanded = true;
 	}
@@ -524,14 +557,12 @@ class Headline {
 	// @param 	{bool} 		no_set 				Whether to make this change persistent. If set to no, the object 
 	// 											can be reversed to its original state with reverse_from_state()
 	// @param 	{bool} 		instant 			If true, the object is shown immediatly, skipping any animations
-	minimize(no_set, instant) {
-		let content_div = this.div.querySelector(".headline-content")
+	minimize(no_set) {
+		let content_div = this.div.querySelector(".headline-content");
 
-		if (instant)
-			this.div.classList.add("instant");
-		else
-			this.div.classList.remove("instant");
-
+		setTimeout(() => {
+			set_glider_max_height(this.get_height());
+		}, 500);
 		this.div.classList.remove("showing");
 		if (!no_set)
 			this.is_expanded = false;
@@ -632,12 +663,12 @@ class Headline {
 	// Checks if the Headline is in the viewport of the device (e.g. shown / currently focused)
 	// @return 	{bool}							Whether or not the Headline is in view	
 	in_view() {
-		if(this.div.getBoundingClientRect().x == 0) 
-			console.log("x", this.div.getBoundingClientRect())
-		
+		// if(this.div.getBoundingClientRect().x == 0) 
+		// console.log("x", this.div.getBoundingClientRect())
+
 		// if(this.div.getBoundingClientRect().y != 0) 
-			// console.log("y", this.div.getBoundingClientRect())
-		return Math.abs(this.div.getBoundingClientRect().x) < 3 && this.div.getBoundingClientRect().y != 0
+		// console.log("y", this.div.getBoundingClientRect())
+		// return Math.abs(this.div.getBoundingClientRect().x) <= 1 && this.div.getBoundingClientRect().y != 0
 		return this.div.getBoundingClientRect().x == 0 && this.div.getBoundingClientRect().y != 0
 	}
 

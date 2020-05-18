@@ -5,17 +5,27 @@ body {
     margin-top: 0px;
 }
 
-.headline {
-    scroll-snap-align: start;
-    /*scroll-snap-stop: always;*/
+.headline-card {
+    margin-top: auto;
+}
 
-    display: inline-block;
+.headline {
+    /*scroll-snap-align: start;*/
+
+    /*display: inline-block;*/
+
+    display: flex;
+
     width: 100%;
     white-space: initial;
+    /*vertical-align: bottom;*/
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-bottom: 5px;
+}
+
+.headline {
     vertical-align: bottom;
-    padding-left: 0.5em;
-    padding-right: 0.5em;
-    padding-bottom: 0.5em;
 }
 
 .headline-title {
@@ -54,8 +64,7 @@ body {
     overflow-x: scroll;
     overflow-y: hidden;
     white-space: nowrap;
-    scroll-snap-type: x mandatory;
-    /*scroll-snap-stop: always;*/
+    /*scroll-snap-type: x mandatory;*/
 }
 
 #scrolling-wrapper {
@@ -69,14 +78,12 @@ body {
 
 #top-part {
     height: 100%;
-    /*scroll-snap-align: center;*/
-    scroll-snap-align: left;
+    scroll-snap-align: center;
 }
 
 #bottom-part {
     height: 100%;
-    /*scroll-snap-align: center;*/
-    scroll-snap-align: left;
+    scroll-snap-align: center;
 }
 
 #headlines_container {
@@ -85,16 +92,16 @@ body {
     width: 100vw;
     overflow: visible;
 
-}
+    /*REMOVE THIS*/
+    /*height: 300px;*/
+    /*background-color: red;*/
+}  
 
 #map {
     width: 100vw;
     height: 100%;
-    /*min-height: -webkit-fill-available*/
-    /*height: 100vh;*/
 }
 
-/*To use position absolute in a relativ context*/
 .rel-wrapper {
     position: relative;
 }
@@ -234,4 +241,7 @@ body {
     color: white;
 }
 
-
+.glider-track {
+    /*background-color: lightgray;*/
+    /*height: 150px;*/
+}

@@ -1,0 +1,54 @@
+<html>
+
+<head>
+	<script src="glider.js"></script>
+	<link rel="stylesheet" type="text/css" href="glider.css">
+</head>
+<style>
+html, body {
+	margin: 0;
+	padding: 0;
+}
+
+.glider-container {
+	margin-top: 200px;
+	width: 100vw;
+	border: 10px solid green;
+	overflow: none;
+}
+
+.content {
+	background-color: red;
+}
+.content.special {
+	background-color: lightgray;
+}
+
+#glider {
+	height: 400px !important;
+	border: 2px solid blue;
+}
+
+</style>
+
+<body>
+	<div class="glider-container">
+			<div class="glider">
+				<div class="content">Test</div>
+				<div class="content special">Test</div>
+				<div class="content">Test</div>
+				<div class="content special">Test</div>
+			</div>
+	</div>
+	<script>
+	new Glider(document.querySelector('.glider'), {
+		// Mobile-first defaults
+		slidesToShow: 1,
+		slidesToScroll: 1,
+		scrollLock: true,
+		duration: 0.25
+	});
+	</script>
+</body>
+
+</html>
