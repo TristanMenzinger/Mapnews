@@ -406,8 +406,12 @@ class Headline {
 
 		this.div.querySelector(".close").onclick = (event) => {
 			// Otherwise the listener just above is triggered
-			this.minimize();
 			event.stopPropagation();
+
+			this.minimize();
+			// If on desktop, remove the markers from the map
+			if(!IS_MOBILE)
+				clear_map();
 		}
 	}
 
