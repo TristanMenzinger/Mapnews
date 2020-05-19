@@ -7,6 +7,7 @@ body {
 
 .headline-card {
     margin-top: auto;
+    width: 100%;
 }
 
 .headline {
@@ -21,7 +22,7 @@ body {
     /*vertical-align: bottom;*/
     padding-left: 5px;
     padding-right: 5px;
-    padding-bottom: 5px;
+    padding-bottom: 2.5px;
 }
 
 .headline {

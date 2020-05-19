@@ -51,6 +51,9 @@ const DESKTOP_NOTHING_FOUND = "Please adjust your filters and search.";
 
 // Whether we're on mobile
 let IS_MOBILE;
+let CAROUSEL;
+
+let FILTER_TIMEOUT;
 
 // --------------------------------------------------------------------------------------------------
 // Initializers
@@ -103,17 +106,17 @@ let init = async (is_mobile) => {
 		ALL_HEADLINES.push(new Headline(raw_headline))
 	}
 
-	// Update the headlines in view
-	apply_filters();
-	update_shown_headlines();
-
-	if(IS_MOBILE) {
+	if (IS_MOBILE) {
 		// Initialize the "Glider" library for sidescrolling
-		initialize_scroll_listener();
+		CAROUSEL = initialize_carousel();
 	}
 
 	// Initialize the map
 	MAP = initialize_map();
+
+	// Update the headlines in view
+	apply_filters();
+	update_shown_headlines();
 }
 
 // Unlimit the headline card container's max height
@@ -124,19 +127,18 @@ let disable_glider_mh = () => {
 // Limit the headline card container's max height
 // @param 	{float}				The max height of the headline container 
 let set_glider_max_height = (max_height) => {
-	document.querySelector('.glider-track').style.maxHeight = (max_height+10)+"px";
+	document.querySelector('.glider-track').style.maxHeight = (max_height + 10) + "px";
 }
 
-// This method initializes a listener on the container of the headlines. It serves the
-// purpose of minimizing all headlines when they are out of view and re-expanding them 
-// when they are in view. This is necessary in order to not overlay the map with the 
-// headline divs.
-//
-// This is an ugly workaround, but since css does _NOT_ seem to allow setting overflow-x to visible 
-// and overflow-y to scroll, there's no way around it.
-// If there is, tell me....
-let initialize_scroll_listener = () => {
-	new Glider(document.querySelector('.glider'), {
+let reinitialize_carousel = () => {
+	// Upon calling carousel.destroy(), the class is permanently removed
+	// which is why we re-add it here if it was gone
+	document.getElementById("headlines").classList.add("glider");
+	CAROUSEL = initialize_carousel();
+}
+
+let initialize_carousel = () => {
+	let carousel = new Glider(document.querySelector('.glider'), {
 		// Mobile-first defaults
 		slidesToShow: 1,
 		slidesToScroll: 1,
@@ -148,7 +150,7 @@ let initialize_scroll_listener = () => {
 	let cnt = 0;
 	document.querySelector('.glider').onscroll = () => {
 		cnt++;
-		if(cnt > 2) {
+		if (cnt > 2) {
 			disable_glider_mh();
 		}
 	}
@@ -156,9 +158,12 @@ let initialize_scroll_listener = () => {
 	document.querySelector('.glider').addEventListener('glider-slide-visible', (event) => {
 		cnt = 0;
 		let headline = ALL_HEADLINES.filter(h => h.is_show)[event.detail.slide]
-		set_glider_max_height(headline.div_card.offsetHeight);
-		headline.show_markers(true);
+		if (headline) {
+			set_glider_max_height(headline.div_card.offsetHeight);
+			headline.show_markers(true);
+		}
 	})
+	return carousel
 }
 
 // Initialize the map
@@ -191,8 +196,22 @@ let initialize_map = () => {
 // The on-input listener for the searchbar
 // @param 	{dom element} 	search_div		The searchbar dom element triggering the event
 let search = (search_div) => {
-	apply_filters(search_div.value);
-	update_shown_headlines();
+	const search_string = document.getElementById("search").value
+	if (IS_MOBILE) {
+
+		// Clear the timeout if there was one
+		if (FILTER_TIMEOUT)
+			clearTimeout(FILTER_TIMEOUT);
+
+		// Wait 1 second before refreshing
+		FILTER_TIMEOUT = setTimeout(function() {
+			apply_filters(search_string);
+			update_shown_headlines();
+		}, 1000);
+	} else {
+		apply_filters(search_string);
+		update_shown_headlines();
+	}
 }
 
 // Toggle the provider upon button click
@@ -207,8 +226,24 @@ let toggle_provider = (clicked_dropdown) => {
 	// Save in localstorage
 	localStorage.setItem('preferences_news_sources', JSON.stringify(NEWS_SOURCES))
 
-	apply_filters();
-	update_shown_headlines();
+	const search_string = document.getElementById("search").value
+	if (IS_MOBILE) {
+			
+		// Clear the timeout if there was one
+		if (FILTER_TIMEOUT)
+			clearTimeout(FILTER_TIMEOUT);
+
+		// Wait 1 second before refreshing
+		FILTER_TIMEOUT = setTimeout(function() {
+			apply_filters(search_string);
+			update_shown_headlines();
+		}, 1000);
+
+	} else {
+		// On desktop update immediately
+		apply_filters(search_string);
+		update_shown_headlines();
+	}
 }
 
 // --------------------------------------------------------------------------------------------------
@@ -221,11 +256,15 @@ let toggle_provider = (clicked_dropdown) => {
 // Splits the headlines to pages if IS_MOBILE is set to false
 let update_shown_headlines = () => {
 
+	if (IS_MOBILE)
+		CAROUSEL.destroy()
+
 	div_all_headlines = document.getElementById("headlines");
 	div_all_headlines.clearChildren();
 
 	for (let headline of ALL_HEADLINES) {
 		if (headline.is_show) {
+			// CAROUSEL.addItem(headline.div);
 			div_all_headlines.appendChild(headline.div);
 		}
 	}
@@ -237,14 +276,20 @@ let update_shown_headlines = () => {
 	}
 
 	if (ALL_HEADLINES.filter(h => h.is_show).length == 0) {
-		if (IS_MOBILE)
+		if (IS_MOBILE) {
 			div_all_headlines.appendChild(fill_nothing_found_template(MOBILE_NOTHING_FOUND));
-		else
+			// CAROUSEL.addItem(fill_nothing_found_template(MOBILE_NOTHING_FOUND));
+		} else {
 			div_all_headlines.appendChild(fill_nothing_found_template(DESKTOP_NOTHING_FOUND));
+			// CAROUSEL.addItem(fill_nothing_found_template(DESKTOP_NOTHING_FOUND));
+		}
 	} else {
 		if (IS_MOBILE)
 			ALL_HEADLINES.filter(h => h.is_show)[0].show_markers(true);
 	}
+
+	if (IS_MOBILE)
+		reinitialize_carousel();
 }
 
 // Applies the filters 
@@ -339,7 +384,7 @@ class Headline {
 		this.link = topnews_data.link;
 		this.source = topnews_data.source;
 		this.key = topnews_data.key;
-		this.summary = replace_http(topnews_data.summary);
+		this.summary = replace_href_target(replace_http(topnews_data.summary));
 
 		this.geolocations = topnews_data.geolocations;
 		this._sanitize_geolocation_names();
@@ -373,6 +418,7 @@ class Headline {
 	// Uses title, summary, surce and published (publish-date) as inputs.
 	_make_div() {
 		this.div = fill_headline_template(this);
+		this.div.jsobj = this;
 		this.div_card = this.div.querySelector(".headline-card");
 
 		let dom_badges = this.div.querySelector(".headline-badges")
@@ -387,8 +433,9 @@ class Headline {
 			}
 			badge.textContent = geolocation.name;
 			badge.onclick = (event) => {
-				if (this.is_focus)
-					event.stopPropagation();
+				// if (this.is_focus)
+				// event.stopPropagation();
+				event.stopPropagation();
 				MAP.setCenterAnimated(new mapkit.Coordinate(geolocation.lat, geolocation.lng), false);
 			}
 			dom_badges.appendChild(badge)
@@ -410,7 +457,7 @@ class Headline {
 
 			this.minimize();
 			// If on desktop, remove the markers from the map
-			if(!IS_MOBILE)
+			if (!IS_MOBILE)
 				clear_map();
 		}
 	}
@@ -495,7 +542,7 @@ class Headline {
 	expand(no_set) {
 		let content_div = this.div.querySelector(".headline-content")
 
-		if(IS_MOBILE) {
+		if (IS_MOBILE) {
 			// Set the maximum height to unlimited, and this card can expand to its full height.
 			disable_glider_mh();
 		}
@@ -511,12 +558,12 @@ class Headline {
 	minimize(no_set) {
 		let content_div = this.div.querySelector(".headline-content");
 
-		if(IS_MOBILE) {
+		if (IS_MOBILE) {
 			// Set the maximum height to this card's height after a certain delay, allowing for the animation to finish.
 			setTimeout(() => {
 				set_glider_max_height(this.get_height());
 			}, 500);
-		}	
+		}
 		this.div.classList.remove("showing");
 		if (!no_set)
 			this.is_expanded = false;
@@ -745,8 +792,10 @@ let get_shapefile_wcache = async (name) => {
 
 // Clears the map of all overlays and annotations
 let clear_map = () => {
-	MAP.removeAnnotations(MAP.annotations)
-	MAP.removeOverlays(MAP.overlays)
+	if (MAP) {
+		MAP.removeAnnotations(MAP.annotations)
+		MAP.removeOverlays(MAP.overlays)
+	}
 }
 
 // CAREFUL: Lat lng are reversed in country shapefiles
@@ -839,6 +888,15 @@ let get_lat_lng_center = (geolocations) => {
 let replace_http = (inner_html_string) => {
 	return inner_html_string.replace(/http:\/\//g, 'https:\/\/');
 }
+
+// Replaces all a links to open in a new tab. 
+// Works for these sources, otherwise probaby not a good idea
+// @param 	{string}		inner_html_string 		The html content with mixed links
+// @return 	{string}		inner_html_string		The html content with new tab links
+let replace_href_target = (inner_html_string) => {
+	return inner_html_string.replace(/<a/g, '<a target="_blank" rel="noopener noreferrer"');
+}
+
 
 // Returns a dom element from a filled template string
 // @param 	{filled_template_string}	search_string 		The search string, can be null if not required
