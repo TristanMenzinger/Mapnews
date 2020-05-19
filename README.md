@@ -1,5 +1,4 @@
-
-
+<br>
 <p align="center">
   <img src="https://raw.githubusercontent.com/TristanMenzinger/Mapnews/readme/Mapnews_logo.png?token=AG7APXVOSZMNXGCVT3AETU26YWVLG" width="13%">
 </p>
