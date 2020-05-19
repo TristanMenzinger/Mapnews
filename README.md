@@ -23,7 +23,7 @@ Thankfully, the code is much cleaner now and consists of just a few lines of Pyt
 ## Packages used
 #### Backend
 * SpaCy for Named Entity Recognition (NER)
-* Newspaper for fetching News articles
+* Newspaper3k for fetching News articles
 * HERE Maps for geocoding 
 #### Frontend
 * Cloudflare Workers as the API & for hosting
