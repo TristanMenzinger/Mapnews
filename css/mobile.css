@@ -148,7 +148,14 @@ body {
 #about {
     margin-top: auto;
     font-size: 10pt;
-    padding-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid lightgray;
+}
+
+#mapcredit {
+    margin-top: 10px;
+    font-size: 10pt;
+    padding-bottom: 8px;
     border-bottom: 1px solid lightgray;
 }
 
@@ -157,12 +164,12 @@ body {
     font-size: 10pt;
 }
 
-#credits > a, #about > a {
+#credits > a, #about > a, #mapcredit > a {
     color: rgb(1, 1, 1);
     text-decoration: underline;
 }
 
-#credits > img, #about > img {
+#credits > img, #about > img, #mapcredit > img{
     height: 20px;
     -webkit-filter: grayscale(1);
     filter: grayscale(1);

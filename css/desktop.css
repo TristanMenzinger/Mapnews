@@ -97,12 +97,22 @@ body {
     width: 40px;
     align-self: center;
 }
-#top-bar-logo span {
+#top-bar-logo span.title {
     flex: 0 0 0;
     align-self: center;
     padding-left: 10px;
     font-weight: 600;
     font-size: 12pt;
+}
+
+#top-bar-logo div.link {
+    flex-grow: 1;
+    font-size: 9pt;
+    text-align: right;
+    text-decoration: underline;
+}
+#top-bar-logo div.link span {
+    cursor: pointer;
 }
 
 #top-bar-selectors {
@@ -117,6 +127,29 @@ body {
     transition: margin-left 0.5s ease-in-out;
 }
 
+#about {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    z-index: 100001;
+    background-color: white;
+    padding: 20%;
+}
+
+#about.hide {
+    display: none;
+}
+
+#about > img {
+    width: 1em;
+}
+
+#about > .close {
+    position: absolute;
+    right: 10%;
+    top: 10%;
+    font-size: 30pt;
+}
 
 #headlines-navigation {
     display: flex;

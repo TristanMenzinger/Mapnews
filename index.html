@@ -1,71 +1,86 @@
 <html>
 
 <head>
-	<meta charset="utf-8">
-	<meta name="description" content="Today's News on a Map">
+    <meta charset="utf-8">
+    <meta name="description" content="Today's News on a Map">
     <meta name="keywords" content="News, Map, Mapnews, RSS">
     <meta name="author" content="TristanMenzinger">
-
-
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-	<script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
-	<!-- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <script src="https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js"></script>
+    <!-- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css" />
 	<script src="https://unpkg.com/leaflet@1.3.3/dist/leaflet.js"></script>
 	<script src='https://unpkg.com/leaflet.mapkitmutant@latest/Leaflet.MapkitMutant.js'></script> -->
-	<script src="js/main.js"></script>
-	<link rel="stylesheet" href="css/general.css" />
-	<link rel="stylesheet" href="css/desktop.css" />
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="js/main.js"></script>
+    <link rel="stylesheet" href="css/general.css" />
+    <link rel="stylesheet" href="css/desktop.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <script type="text/javascript">
 const user_mobile = (navigator.userAgent.match(/Android/i) ||
-	navigator.userAgent.match(/webOS/i) ||
-	navigator.userAgent.match(/iPhone/i) ||
-	navigator.userAgent.match(/iPod/i) ||
-	navigator.userAgent.match(/BlackBerry/i) ||
-	navigator.userAgent.match(/Windows Phone/i));
+    navigator.userAgent.match(/webOS/i) ||
+    navigator.userAgent.match(/iPhone/i) ||
+    navigator.userAgent.match(/iPod/i) ||
+    navigator.userAgent.match(/BlackBerry/i) ||
+    navigator.userAgent.match(/Windows Phone/i));
 const width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 if (user_mobile && width < 1000) {
-	document.location = "mobile/index.html";
+    document.location = "mobile/index.html";
 }
 </script>
 
 <body onload="init()">
-	<div id="bar-left" class="">
-		<div id="top-bar">
-			<div id="top-bar-logo">
-				<img src="images/mapnewslogo.png">
-				<span>Mapnews.io</span>
-			</div>
-			<div id="top-bar-selectors">
-				<button id="top-bar-sourceselector" type="button" class="btn btn-primary dropdown">
-					<div href="#" data-toggle="dropdown" class="dropdown-toggle">Sources
-						<b class="caret"></b>
-					</div>
-					<div id="dropdown-items" class="dropdown-menu shadow-sm">
-						<a class="dropdown-item" id="dropdown_bbc" onclick="toggle_provider(this)">BBC</a>
-						<a class="dropdown-item" id="dropdown_nyt" onclick="toggle_provider(this)">The New York Times</a>
-						<a class="dropdown-item" id="dropdown_tg" onclick="toggle_provider(this)">The Guardian</a>
-						<a class="dropdown-item" id="dropdown_r" onclick="toggle_provider(this)">Reuters</a>
-						<a class="dropdown-item" id="dropdown_lat" onclick="toggle_provider(this)">Los Angeles Times</a>
-					</div>
-				</button>
-				<div id="top-bar-searchbar" class="input-group">
-					<div class="input-group-prepend">
-						<span class="input-group-text" id="basic-addon1">
-							<i class="fas fa-search"></i>
-						</span>
-					</div>
-					<input id="search" type="text" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="basic-addon1" oninput="search(this)">
-				</div>
-			</div>
-		</div>
-		<!-- 			<div id="top-bar-logo">
+    <div id="about" class="hide">
+        <img src="../images/github.svg">
+        Check out the project on <a target="_blank" rel="noopener noreferrer" href="https://github.com/TristanMenzinger/Mapnews">GitHub</a>
+        or <a target="_blank" rel="noopener noreferrer" href="https://github.com/TristanMenzinger">get in touch</a>.
+        <hr>
+        <img src="../images/map.svg">
+        Maps via Apple Maps (<a href="https://www.apple.com/legal/internet-services/maps/legal-en.html">Legal</a>)
+        <hr>
+        <img src="../images/rss.svg">
+        All News collected via RSS from the <a target="_blank" rel="noopener noreferrer" href="https://bbc.com">BBC</a>, <a target="_blank" rel="noopener noreferrer" href="https://nytimes.com">The New York Times</a>, <a target="_blank" rel="noopener noreferrer" href="https://bbc.com">The Guardian</a>, <a target="_blank" rel="noopener noreferrer" href="https://reuters.com">Reuters</a> and <a target="_blank" rel="noopener noreferrer" href="https://latimes.com">The Los Angeles Times</a>.
+        <button type="button" class="close" aria-label="Close" onclick="close_about();">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div id="bar-left" class="">
+        <div id="top-bar">
+            <div id="top-bar-logo">
+                <img src="images/mapnewslogo.png">
+                <span class="title">Mapnews.io</span>
+                <div class="link" onclick="show_about();">
+                    <span>About</span>
+                </div>
+            </div>
+            <div id="top-bar-selectors">
+                <button id="top-bar-sourceselector" type="button" class="btn btn-primary dropdown">
+                    <div href="#" data-toggle="dropdown" class="dropdown-toggle">Sources
+                        <b class="caret"></b>
+                    </div>
+                    <div id="dropdown-items" class="dropdown-menu shadow-sm">
+                        <a class="dropdown-item" id="dropdown_bbc" onclick="toggle_provider(this)">BBC</a>
+                        <a class="dropdown-item" id="dropdown_nyt" onclick="toggle_provider(this)">The New York Times</a>
+                        <a class="dropdown-item" id="dropdown_tg" onclick="toggle_provider(this)">The Guardian</a>
+                        <a class="dropdown-item" id="dropdown_r" onclick="toggle_provider(this)">Reuters</a>
+                        <a class="dropdown-item" id="dropdown_lat" onclick="toggle_provider(this)">Los Angeles Times</a>
+                    </div>
+                </button>
+                <div id="top-bar-searchbar" class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">
+                            <i class="fas fa-search"></i>
+                        </span>
+                    </div>
+                    <input id="search" type="text" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="basic-addon1" oninput="search(this)">
+                </div>
+            </div>
+        </div>
+        <!-- 			<div id="top-bar-logo">
 				<img src="images/mapnewslogo.png">
 				<div id="logo-text">Mapnews.io</div>
 			</div> -->
-		<!-- 			<div id="top-bar-selector">
+        <!-- 			<div id="top-bar-selector">
 				<button id="top-bar-sourceselector" type="button" class="btn btn-primary dropdown">
 					<div href="#" data-toggle="dropdown" class="dropdown-toggle">Sources
 						<b class="caret"></b>
@@ -87,21 +102,21 @@ if (user_mobile && width < 1000) {
 					<input id="search" type="text" class="form-control" placeholder="Search regex" aria-label="Search" aria-describedby="basic-addon1" oninput="search(this)">
 				</div>
 			</div> -->
-		<!-- </div> -->
-		<div id="headlines_container">
-			<div id="headlines">
-			</div>
-		</div>
-		<div id="headlines-navigation">
-			<nav aria-label="Page navigation example">
-				<ul class="pagination">
-					<li class="page-item page-prev" id="pagination-start"><a class="page-link" href="#" onclick="switch_to_page(CURRENT_PAGE-1)"><i class="fas fa-backward"></i></a></li>
-					<li class="page-item page-next"><a class="page-link" href="#" onclick="switch_to_page(CURRENT_PAGE+1)"><i class="fas fa-forward"></i></a></li>
-				</ul>
-			</nav>
-		</div>
-	</div>
-	<div id="map">
+        <!-- </div> -->
+        <div id="headlines_container">
+            <div id="headlines">
+            </div>
+        </div>
+        <div id="headlines-navigation">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination">
+                    <li class="page-item page-prev" id="pagination-start"><a class="page-link" href="#" onclick="switch_to_page(CURRENT_PAGE-1)"><i class="fas fa-backward"></i></a></li>
+                    <li class="page-item page-next"><a class="page-link" href="#" onclick="switch_to_page(CURRENT_PAGE+1)"><i class="fas fa-forward"></i></a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <div id="map">
 </body>
 
 </html>

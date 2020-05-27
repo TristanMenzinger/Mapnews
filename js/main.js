@@ -119,6 +119,15 @@ let init = async (is_mobile) => {
 	update_shown_headlines();
 }
 
+// Show about window
+let show_about = () => {
+	document.getElementById("about").classList.remove("hide");
+}
+// Close about window
+let close_about = () => {
+	document.getElementById("about").classList.add("hide");
+}
+
 // Unlimit the headline card container's max height
 let disable_glider_mh = () => {
 	document.querySelector('.glider-track').style.maxHeight = "9999px";
@@ -143,7 +152,8 @@ let initialize_carousel = () => {
 		slidesToShow: 1,
 		slidesToScroll: 1,
 		scrollLock: true,
-		duration: 0.4
+		duration: 0.4,
+		scrollLockDelay: 0
 	});
 
 
@@ -380,7 +390,14 @@ class Headline {
 	// Generates the dom element, onclick / ontouch listener
 	constructor(topnews_data) {
 		this.title = topnews_data.title;
-		this.published = topnews_data.published;
+
+		try {
+			this.published = new Date(Date.parse(topnews_data.published)).toLocaleString();
+		}catch{
+			this.published = topnews_data.published;
+		}
+		
+
 		this.link = topnews_data.link;
 		this.source = topnews_data.source;
 		this.key = topnews_data.key;
