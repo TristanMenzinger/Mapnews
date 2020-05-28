@@ -106,6 +106,10 @@ let init = async (is_mobile) => {
 		ALL_HEADLINES.push(new Headline(raw_headline))
 	}
 
+
+	ALL_HEADLINES = ALL_HEADLINES.sort(function(a,b){ return b.published_dt - a.published_dt });
+
+
 	if (IS_MOBILE) {
 		// Initialize the "Glider" library for sidescrolling
 		CAROUSEL = initialize_carousel();
@@ -392,11 +396,15 @@ class Headline {
 		this.title = topnews_data.title;
 
 		try {
-			this.published = new Date(Date.parse(topnews_data.published)).toLocaleString();
+			// Parse date & save date and formatted string
+			this.published_dt = new Date(Date.parse(topnews_data.published))
+			this.published = this.published_dt.toLocaleString();
 		}catch{
+			// Leave as default string, set date attribute to null
+			// Will still allow sorting, but move to the back
 			this.published = topnews_data.published;
+			this.published_dt = null;
 		}
-		
 
 		this.link = topnews_data.link;
 		this.source = topnews_data.source;
