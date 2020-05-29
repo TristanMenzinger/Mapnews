@@ -304,6 +304,8 @@ let update_shown_headlines = () => {
 
 	if (IS_MOBILE)
 		reinitialize_carousel();
+	else
+		document.getElementById("headlines_container").scrollTo(0, 0);
 }
 
 // Applies the filters 
@@ -367,6 +369,8 @@ let switch_to_page = (page_nr) => {
 
 	CURRENT_PAGE = page_nr
 	show_headlines(PAGES[page_nr])
+
+	document.getElementById("headlines_container").scrollTo(0, 0);
 }
 
 // Clear all shown headlines
