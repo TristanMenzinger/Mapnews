@@ -7,6 +7,7 @@
 /*-------------------------------------------------*/
 .headline-content {
     font-size: 10pt;
+    overflow: hidden !important;
 }
 
 .headline.showing .headline-content {
