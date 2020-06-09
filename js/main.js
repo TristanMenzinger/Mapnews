@@ -1,4 +1,4 @@
-let _DEV = "?dev_local=true";
+let _DEV = "?dev_remote=true";
 
 // Global variables for Pagination (Desktop only)
 // The current page we're one
@@ -45,6 +45,8 @@ let SANE_COUNTRY_NAMES = {
     "Us": "United States of America",
     "U.S.": "United States of America",
     "U.s.": "United States of America",
+    "The United States of America": "United States of America",
+    "The United States": "United States of America",
     "Uk": "United Kingdom"
 }
 
@@ -290,17 +292,19 @@ let toggle_provider = (clicked_dropdown) => {
 let update_shown_headlines = () => {
 
     let headlines_to_show = ALL_HEADLINES.filter(h => h.is_show);
+    if(IS_MOBILE) {
+        for (let x = 0; x < headlines_to_show.length; x++) {
+            if ((x + 1) < headlines_to_show.length)
+                headlines_to_show[x].next = headlines_to_show[x + 1];
+            if ((x - 1) >= 0)
+                headlines_to_show[x].previous = headlines_to_show[x - 1];
+        }
 
-    for (let x = 0; x < headlines_to_show.length; x++) {
-        if ((x + 1) < headlines_to_show.length)
-            headlines_to_show[x].next = headlines_to_show[x + 1];
-
-        if ((x - 1) >= 0)
-            headlines_to_show[x].previous = headlines_to_show[x - 1];
+        headlines_to_show.map(h => h.set_out_of_view());
     }
 
-    div_all_headlines = document.getElementById("headlines_container_divs");
-    div_all_headlines.clearChildren();
+    div_all_headlines = document.getElementById("headlines_container_divs")
+    clear_headlines();
 
     for (let headline of ALL_HEADLINES) {
         if (headline.is_show) {
@@ -532,9 +536,12 @@ class Headline {
             let deltaY = event.touches[0].clientY - this.startY;
 
             // On swipe up, dont scroll right and left
-            if(Math.abs(deltaX) < Math.abs(deltaY) && Math.abs(deltaY) > 10) {
+            if(Math.abs(deltaX) < Math.abs(deltaY) && Math.abs(deltaY) > 3) {
                 return;
             }
+
+            // So you can' scroll up anymore
+            event.preventDefault();
 
             this.div.style.transform = `translateX(${deltaX}px)`;
 
@@ -566,6 +573,10 @@ class Headline {
                     this.center()
             }
         }
+    }
+
+    set_out_of_view() {
+        this._move(screen.width, false);
     }
 
     center(smooth=true, show_markers=true) {
