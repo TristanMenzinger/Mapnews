@@ -3,7 +3,7 @@
   <img src="https://raw.githubusercontent.com/TristanMenzinger/Mapnews/readme/Mapnews_logo.png?token=AG7APXVOSZMNXGCVT3AETU26YWVLG" width="13%">
 </p>
 
-Every day, things happen all around the world, but I rarely tought about where exactly things are happening. This is why, some years ago, I first created this. I hope you like it. Visit <a href="https://mapnews.io">the website here</a>.
+Every day, things happen all around the world, but I rarely tought about where exactly. This is why, some years ago, I first created this. I hope you like it. Visit <a href="https://mapnews.io">the website here</a>.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/TristanMenzinger/Mapnews/readme/Mapnews_example_image.jpg?token=AG7APXU4PQTDY4L3N2WW6726YWPUY" width="80%">
