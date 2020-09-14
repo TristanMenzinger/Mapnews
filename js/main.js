@@ -1,5 +1,6 @@
 // let _DEV = "?dev_remote=true";
 // let _DEV = "?dev_iphone=true";
+let _DEV = "";
 
 // Global variables for Pagination (Desktop only)
 // The current page we're one
@@ -48,7 +49,8 @@ let SANE_COUNTRY_NAMES = {
     "U.s.": "United States of America",
     "The United States of America": "United States of America",
     "The United States": "United States of America",
-    "Uk": "United Kingdom"
+    "Uk": "United Kingdom",
+    "The United Kingdom": "United Kingdom"
 }
 
 // Error messages 
