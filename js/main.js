@@ -574,7 +574,7 @@ class Headline {
             this._set_smooth(true);
 
             let delta = event.changedTouches[0].clientX - this.startX;
-            let transaction_threshold_reached = Math.abs(delta) > screen.width * 0.5;
+            let transaction_threshold_reached = Math.abs(delta) > screen.width * 0.35;
 
             if (!transaction_threshold_reached)
                 return this.center();
