@@ -13,9 +13,18 @@ body {
 }
 
 .headline {
+    /*display: none;*/
+
     padding-left: 5px;
     padding-right: 5px;
     padding-bottom: 5px;
+}
+
+.headline.out-of-view {
+    display: none;
+}
+.headline.in_proximity {
+    display: inherit;
 }
 
 .headline {

@@ -1,4 +1,5 @@
-let _DEV = "?dev_remote=true";
+// let _DEV = "?dev_remote=true";
+// let _DEV = "?dev_iphone=true";
 
 // Global variables for Pagination (Desktop only)
 // The current page we're one
@@ -292,7 +293,7 @@ let toggle_provider = (clicked_dropdown) => {
 let update_shown_headlines = () => {
 
     let headlines_to_show = ALL_HEADLINES.filter(h => h.is_show);
-    if(IS_MOBILE) {
+    if (IS_MOBILE) {
         for (let x = 0; x < headlines_to_show.length; x++) {
             if ((x + 1) < headlines_to_show.length)
                 headlines_to_show[x].next = headlines_to_show[x + 1];
@@ -460,8 +461,8 @@ class Headline {
         this._make_div();
         this._add_onclick_listeners();
 
-        if (IS_MOBILE)
-            this._add_touch_listeners();
+         if (IS_MOBILE)
+             this._add_touch_listeners();
         // this._add_onswipe_listener();
     }
 
@@ -509,15 +510,24 @@ class Headline {
         this.div.style.transform = `translateX(${screen.width}px)`
 
         let headlines_container = document.querySelector('#headlines_container');
+        let headlines_container_divs = document.querySelector("#headlines_container_divs")
         this.div.ontouchstart = (event) => {
+
+
+            // let max_height = Math.min(this.next ? this.next.div_card.offsetHeight : 999999, this.previous ? this.previous.div_card.offsetHeight : 999999)
+            // max_height = Math.min(max_height, this.div_card.offsetHeight)
+
+            // headlines_container_divs.style.height = max_height + 10 + "px";
+            
+            headlines_container_divs.style.height = "100%";
             headlines_container.style.height = "100%";
 
             this._set_smooth(false);
 
-            if(this.next)
+            if (this.next)
                 this.next._set_smooth(false);
 
-            if(this.previous)
+            if (this.previous)
                 this.previous._set_smooth(false);
 
             this.startX = event.touches[0].clientX;
@@ -525,10 +535,10 @@ class Headline {
         }
 
         this.div.ontouchmove = (event) => {
-            if(!this.startX)
+            if (!this.startX)
                 this.startX = event.touches[0].clientX;
 
-            if(!this.startY)
+            if (!this.startY)
                 this.startY = event.touches[0].clientY;
 
 
@@ -536,7 +546,15 @@ class Headline {
             let deltaY = event.touches[0].clientY - this.startY;
 
             // On swipe up, dont scroll right and left
-            if(Math.abs(deltaX) < Math.abs(deltaY) && Math.abs(deltaY) > 3) {
+            if (Math.abs(deltaX) < Math.abs(deltaY) && Math.abs(deltaY) > 3) {
+                if(this.set)
+                    return
+                else {
+                    this.set = true;
+                    headlines_container.style.height = this.div_card.offsetHeight + 10 + "px";
+                    headlines_container_divs.style.height = this.div_card.offsetHeight + 10 + "px";
+                    return;
+                }
                 return;
             }
 
@@ -545,10 +563,10 @@ class Headline {
 
             this.div.style.transform = `translateX(${deltaX}px)`;
 
-            if(this.previous)
+            if (this.previous)
                 this.previous._trace(-screen.width + deltaX);
 
-            if(this.next)
+            if (this.next)
                 this.next._trace(+screen.width + deltaX);
 
         }
@@ -558,16 +576,16 @@ class Headline {
             let delta = event.changedTouches[0].clientX - this.startX;
             let transaction_threshold_reached = Math.abs(delta) > screen.width * 0.5;
 
-            if(!transaction_threshold_reached)
+            if (!transaction_threshold_reached)
                 return this.center();
 
-            if(delta < 0) {
-                if(this.next)
+            if (delta < 0) {
+                if (this.next)
                     this.next.center()
                 else
                     this.center()
-            }else if(delta > 0) {
-                if(this.previous)
+            } else if (delta > 0) {
+                if (this.previous)
                     this.previous.center()
                 else
                     this.center()
@@ -579,11 +597,12 @@ class Headline {
         this._move(screen.width, false);
     }
 
-    center(smooth=true, show_markers=true) {
-        if(this.next)
+    center(smooth = true, show_markers = true) {
+
+        if (this.next)
             this.next._move(screen.width, smooth);
 
-        if(this.previous)
+        if (this.previous)
             this.previous._move(-screen.width, smooth);
 
         this._move(0, smooth);
@@ -591,22 +610,31 @@ class Headline {
         setTimeout(() => {
             this._adapt_container();
         }, 300);
-        if(show_markers)
+
+        if (show_markers)
             this.show_markers(true)
+
+        // ALL_HEADLINES.map(h => {
+        //     h.set_out_of_view("out-of-view");
+        // })
+
+        // this.set_in_view()
+
     }
     _trace(x) {
         this.div.style.transform = `translateX(${x}px)`;
     }
-    _move(x, smooth=true) {
-        if(smooth)
+    _move(x, smooth = true) {
+        if (smooth)
             this.div.classList.add("smooth");
         else
             this.div.classList.remove("smooth");
 
-        this.div.style.transform = `translateX(${x}px)`;   
+        this.div.style.transform = `translateX(${x}px)`;
     }
+
     _set_smooth(bool) {
-        if(bool)
+        if (bool)
             this.div.classList.add("smooth");
         else
             this.div.classList.remove("smooth");
@@ -636,6 +664,7 @@ class Headline {
     _adapt_container() {
         let headlines_container = document.querySelector('#headlines_container');
         headlines_container.style.height = this.div_card.offsetHeight + 10 + "px";
+        document.querySelector("#headlines_container_divs").style.height = this.div_card.offsetHeight + 10 + "px";
     }
 
     // DEPRECATED
@@ -752,7 +781,7 @@ class Headline {
     // Show's the headlines markers on the map
     // Removes all other markers from the map
     async show_markers(truefocus) {
-        if(this.markers_shown)
+        if (this.markers_shown)
             return;
 
         ALL_HEADLINES.map(h => h.markers_shown = false);
