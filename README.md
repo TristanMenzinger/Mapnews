@@ -18,7 +18,8 @@ I first made this (for myself) when I was 16, after I had noticed that all Reute
 The very first version consisted of around 2500 lines of inefficient, unreliable and unstructured Java Code using Rome RSS, Boilerpipe, Stanford NLP, Google Geolocation Services and Lucene Text Analyzer. 
 I re-discovered this during the stay-at-home time of Covid-19 and decided to redo and release the project.
 
-Thankfully, the code is much cleaner now and consists of just a few lines of Python using SpaCy, Newspaper3k and the HERE Maps API. I tried to create a native-like experience where you can swipe to navigate for mobile and I am happy to hear if you like it. 
+Thankfully, the code is much cleaner now (only talking about the backend!) and consists of just a few lines of Python using SpaCy, Newspaper3k and the HERE Maps API. I tried to create a native-like experience where you can swipe to navigate for mobile and I am happy to hear if you like it. Unfortunately, this got more complicated than anticipated, and the CSS/JS became relatively large/complicated. 
+Switching between touch inputs on div's of different heights (the cards), the map and the up-and-down swiping motion proved (very) challenging.
 
 ## Packages used
 #### Backend
@@ -28,7 +29,7 @@ Thankfully, the code is much cleaner now and consists of just a few lines of Pyt
 #### Frontend
 * Cloudflare Workers as the API & for hosting
 * Apple Maps
-* Glider.js (purely native scrolling is still ... lacking)
+* I created my own slider with CSS transforms (previously Glide.js) 
 
 ## Issues
 * NLP results generally feature quite a few false positives, especially since the input is also automatically generated and not curated
