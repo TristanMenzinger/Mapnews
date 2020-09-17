@@ -33,15 +33,29 @@ let NEWS_SOURCES = {
         "name": "The Guardian",
         "selected": true
     },
-    "r": {
-        "name": "Reuters",
-        "selected": true
-    },
+    // "r": {
+    //     "name": "Reuters",
+    //     "selected": true
+    // },
     "lat": {
         "name": "Los Angeles Times",
         "selected": true
     },
+    "aljz": {
+        "name": "Aljazeera",
+        "selected": true
+    },
 }
+
+let DATE_THRESHOLDS = {
+    "1hr": new Date(new Date().setHours(new Date().getHours() - 1)),
+    "4hrs": new Date(new Date().setHours(new Date().getHours() - 4)),
+    "12hrs": new Date(new Date().setHours(new Date().getHours() - 12)),
+    "24hrs": new Date(new Date().setHours(new Date().getHours() - 24)),
+    "all": new Date(new Date().setHours(new Date().getHours() - 24 * 30))
+}
+
+let DATE_THRESHOLD = DATE_THRESHOLDS["all"];
 
 let SANE_COUNTRY_NAMES = {
     "Us": "United States of America",
@@ -81,6 +95,14 @@ let init = async (is_mobile) => {
                 document.getElementById("explanation-overlay").classList.add("hide");
             }
         }
+    }
+
+    if (IS_MOBILE) {
+        let time_preference = localStorage.getItem('preferences_time');
+        if (Object.keys(DATE_THRESHOLDS).includes(time_preference))
+            apply_timefilter(time_preference)
+        else
+            apply_timefilter("all");
     }
 
 
@@ -234,22 +256,28 @@ let initialize_map = () => {
 // The on-input listener for the searchbar
 // @param   {dom element}   search_div      The searchbar dom element triggering the event
 let search = (search_div) => {
-    const search_string = document.getElementById("search").value
-    if (IS_MOBILE) {
+    update_filters();
+}
 
-        // Clear the timeout if there was one
-        if (FILTER_TIMEOUT)
-            clearTimeout(FILTER_TIMEOUT);
+let toggle_time = (clicked_dropdown) => {
+    selected_time = clicked_dropdown.id.replace("dropdown_", "");
+    apply_timefilter(selected_time);
 
-        // Wait 1 second before refreshing
-        FILTER_TIMEOUT = setTimeout(function() {
-            apply_filters(search_string);
-            update_shown_headlines();
-        }, 1000);
-    } else {
-        apply_filters(search_string);
-        update_shown_headlines();
-    }
+    localStorage.setItem('preferences_time', selected_time);
+}
+
+let apply_timefilter = (timestring) => {
+
+    DATE_THRESHOLD = DATE_THRESHOLDS[timestring];
+    document.getElementById("dropdown_1hr").classList.remove("selected");
+    document.getElementById("dropdown_4hrs").classList.remove("selected");
+    document.getElementById("dropdown_12hrs").classList.remove("selected");
+    document.getElementById("dropdown_24hrs").classList.remove("selected");
+    document.getElementById("dropdown_all").classList.remove("selected");
+
+    document.getElementById("dropdown_" + timestring).classList.add("selected");
+
+    update_filters();
 }
 
 // Toggle the provider upon button click
@@ -258,12 +286,16 @@ let search = (search_div) => {
 let toggle_provider = (clicked_dropdown) => {
     selected_source = clicked_dropdown.id.replace("dropdown_", "");
     clicked_dropdown.classList.toggle("selected");
-    console.log(selected_source);
+    // console.log(selected_source);
     NEWS_SOURCES[selected_source].selected = !NEWS_SOURCES[selected_source].selected;
 
     // Save in localstorage
     localStorage.setItem('preferences_news_sources', JSON.stringify(NEWS_SOURCES))
 
+    update_filters();
+}
+
+let update_filters = () => {
     const search_string = document.getElementById("search").value
     if (IS_MOBILE) {
 
@@ -276,9 +308,7 @@ let toggle_provider = (clicked_dropdown) => {
             apply_filters(search_string);
             update_shown_headlines();
         }, 1000);
-
     } else {
-        // On desktop update immediately
         apply_filters(search_string);
         update_shown_headlines();
     }
@@ -299,12 +329,21 @@ let update_shown_headlines = () => {
         for (let x = 0; x < headlines_to_show.length; x++) {
             if ((x + 1) < headlines_to_show.length)
                 headlines_to_show[x].next = headlines_to_show[x + 1];
+            else
+                headlines_to_show[x].next = null;
+
             if ((x - 1) >= 0)
                 headlines_to_show[x].previous = headlines_to_show[x - 1];
+            else
+                headlines_to_show[x].previous = null;
+
         }
 
         headlines_to_show.map(h => h.set_out_of_view());
     }
+
+    let counters = document.querySelectorAll(".count-to-show");
+    Array.from(counters).map(c => c.textContent = `Showing ${headlines_to_show.length} articles`);
 
     div_all_headlines = document.getElementById("headlines_container_divs")
     clear_headlines();
@@ -347,7 +386,7 @@ let update_shown_headlines = () => {
 let apply_filters = (search_string) => {
     allowed_source_names = Object.keys(NEWS_SOURCES).filter(key => NEWS_SOURCES[key].selected).map(key => NEWS_SOURCES[key].name)
     for (let headline of ALL_HEADLINES) {
-        if (headline.search_self(allowed_source_names, search_string)) {
+        if (headline.search_self(allowed_source_names, search_string, DATE_THRESHOLD)) {
             headline.show()
         } else {
             headline.hide()
@@ -446,7 +485,10 @@ class Headline {
         this.link = topnews_data.link;
         this.source = topnews_data.source;
         this.key = topnews_data.key;
+
+
         this.summary = replace_href_target(replace_http(topnews_data.summary));
+        this.summary = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
 
         this.geolocations = topnews_data.geolocations;
         this._sanitize_geolocation_names();
@@ -463,8 +505,8 @@ class Headline {
         this._make_div();
         this._add_onclick_listeners();
 
-         if (IS_MOBILE)
-             this._add_touch_listeners();
+        if (IS_MOBILE)
+            this._add_touch_listeners();
         // this._add_onswipe_listener();
     }
 
@@ -520,7 +562,7 @@ class Headline {
             // max_height = Math.min(max_height, this.div_card.offsetHeight)
 
             // headlines_container_divs.style.height = max_height + 10 + "px";
-            
+
             headlines_container_divs.style.height = "100%";
             headlines_container.style.height = "100%";
 
@@ -549,7 +591,7 @@ class Headline {
 
             // On swipe up, dont scroll right and left
             if (Math.abs(deltaX) < Math.abs(deltaY) && Math.abs(deltaY) > 3) {
-                if(this.set)
+                if (this.set)
                     return
                 else {
                     this.set = true;
@@ -755,7 +797,7 @@ class Headline {
 
             setTimeout(() => {
                 this._adapt_container();
-            }, 300);
+            }, 400);
 
         }
         this.div.classList.add("showing");
@@ -850,11 +892,16 @@ class Headline {
     // Searches the headline 
     // @param   {array}     allowed_sources     An Array of allowed news sources 
     // @param   {type}      re_search_string    The search query (can be regex or just standard text) 
+    // @param   {date}      date_threshold      The maximum "age" of the item
     // 
     // @return  {bool}      found               Whether the this headline corresponds to the query & allowed sources
-    search_self(allowed_sources, re_search_string) {
+    search_self(allowed_sources, re_search_string, date_threshold) {
 
-        // Check if the source is allowed
+        // If its to old -> discard
+        if (!this.published_dt || this.published_dt < date_threshold)
+            return false
+
+        // If it's not an ok source -> discard
         if (!allowed_sources.includes(this.source))
             return false;
 

@@ -57,7 +57,7 @@ if (!user_mobile || width > 1000) {
                     <div id="map"></div>
                     <div id="headlines_container">
                         <div id="headlines_container_divs" class="rel">
-<!--                             <div class="headline">
+                            <!--                             <div class="headline">
                                 <div class="card shadow-sm headline-card">
                                     <div class="card-body headline-card-body">
                                         <div class="headline-title">
@@ -100,12 +100,33 @@ if (!user_mobile || width > 1000) {
                     </div>
                     <input id="search" type="text" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="basic-addon1" oninput="search(this)">
                 </div>
-                <div id="source-selector">
-                    <button type="button" class="btn btn-outline-secondary" id="dropdown_bbc" onclick="toggle_provider(this)">BBC</button>
-                    <button type="button" class="btn btn-outline-secondary" id="dropdown_nyt" onclick="toggle_provider(this)">The New York Times</button>
-                    <button type="button" class="btn btn-outline-secondary" id="dropdown_tg" onclick="toggle_provider(this)">The Guardian</button>
-                    <button type="button" class="btn btn-outline-secondary" id="dropdown_r" onclick="toggle_provider(this)">Reuters</button>
-                    <button type="button" class="btn btn-outline-secondary" id="dropdown_lat" onclick="toggle_provider(this)">Los Angeles Times</button>
+                <div id="selectors">
+                    <div id="source-selector">
+                        <button type="button" class="btn btn-outline-secondary" id="dropdown_bbc" onclick="toggle_provider(this)">BBC</button>
+                        <button type="button" class="btn btn-outline-secondary" id="dropdown_nyt" onclick="toggle_provider(this)">The New York Times</button>
+                        <button type="button" class="btn btn-outline-secondary" id="dropdown_tg" onclick="toggle_provider(this)">The Guardian</button>
+                        <button type="button" class="btn btn-outline-secondary" id="dropdown_lat" onclick="toggle_provider(this)">Los Angeles Times</button>
+                        <button type="button" class="btn btn-outline-secondary" id="dropdown_aljz" onclick="toggle_provider(this)">Aljazeera</button>
+                        <div class="d-flex flex-row">
+                            <div class="count-to-show small gray">
+                                Showing N articles
+                            </div>
+                            <div class="small ml-auto gray">1 of 2 filters <i class="fas fa-arrow-right"></i></div>
+                        </div>
+                    </div>
+                    <div id="time-selector">
+                        <button type="button" class="btn btn-outline-secondary" id="dropdown_1hr" onclick="toggle_time(this)">Last hour</button>
+                        <button type="button" class="btn btn-outline-secondary" id="dropdown_4hrs" onclick="toggle_time(this)">Last 4 hours</button>
+                        <button type="button" class="btn btn-outline-secondary" id="dropdown_12hrs" onclick="toggle_time(this)">Last 12 hours</button>
+                        <button type="button" class="btn btn-outline-secondary" id="dropdown_24hrs" onclick="toggle_time(this)">Last 24 hours</button>
+                        <button type="button" class="btn btn-outline-secondary selected" id="dropdown_all" onclick="toggle_time(this)">All</button>
+                        <div class="d-flex flex-row">
+                            <div class="count-to-show small gray">
+                                Showing N articles
+                            </div>
+                            <div class="small ml-auto gray"><i class="fas fa-arrow-left"></i> 2 of 2 filters</div>
+                        </div>
+                    </div>
                 </div>
                 <div id="about">
                     <img src="../images/github.svg">
@@ -118,7 +139,7 @@ if (!user_mobile || width > 1000) {
                 </div>
                 <div id="credits">
                     <img src="../images/rss.svg">
-                    All News collected via RSS from the <a target="_blank" rel="noopener noreferrer" href="https://bbc.com">BBC</a>, <a target="_blank" rel="noopener noreferrer" href="https://nytimes.com">The New York Times</a>, <a target="_blank" rel="noopener noreferrer" href="https://bbc.com">The Guardian</a>, <a target="_blank" rel="noopener noreferrer" href="https://reuters.com">Reuters</a> and <a target="_blank" rel="noopener noreferrer" href="https://latimes.com">The Los Angeles Times</a>.
+                    All News collected via RSS from the <a target="_blank" rel="noopener noreferrer" href="https://bbc.com">BBC</a>, <a target="_blank" rel="noopener noreferrer" href="https://nytimes.com">The New York Times</a>, <a target="_blank" rel="noopener noreferrer" href="https://bbc.com">The Guardian</a>, <a target="_blank" rel="noopener noreferrer" href="https://www.aljazeera.com/">Aljazeera</a> and <a target="_blank" rel="noopener noreferrer" href="https://latimes.com">The Los Angeles Times</a>.
                 </div>
             </div>
         </div>
