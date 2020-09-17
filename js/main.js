@@ -488,7 +488,6 @@ class Headline {
 
 
         this.summary = replace_href_target(replace_http(topnews_data.summary));
-        this.summary = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
 
         this.geolocations = topnews_data.geolocations;
         this._sanitize_geolocation_names();
@@ -618,7 +617,7 @@ class Headline {
             this._set_smooth(true);
 
             let delta = event.changedTouches[0].clientX - this.startX;
-            let transaction_threshold_reached = Math.abs(delta) > screen.width * 0.35;
+            let transaction_threshold_reached = Math.abs(delta) > screen.width * 0.15;
 
             if (!transaction_threshold_reached)
                 return this.center();
