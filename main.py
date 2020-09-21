@@ -108,11 +108,12 @@ def upload(new_parsed_entries_json):
         "value": base64_bytes.decode('UTF-8'),
         "base64": True
     }
+    print(update_KV([top_news_json]).text)
 
 def update_KV(json_array):
     # HAS to be an Array (!)
     headers = {
-        "Authorization": "Bearer "+ CLOUDFLARE_BEARER_TOKEN,
+        "Authorization": "Bearer " +  CLOUDFLARE_BEARER_TOKEN,
         "Content-Type": "application/json"
     }
     response = requests.put("https://api.cloudflare.com/client/v4/accounts/b4d8e6840063ec76d6696c51338b3f43/storage/kv/namespaces/40f1dac2027141bba277172bb0132277/bulk",
@@ -156,16 +157,32 @@ def read_recent_rss_feeds():
     #     "feed_name": "World",
     #     "feed_url": "http://feeds.washingtonpost.com/rss/world"
     # }
-    # rss_entries += [{**rss_provider, **entry} for entry in feedparser.parse(rss_provider["feed_url"]).entries]
+    # rss_entries  = [{**rss_provider, **entry} for entry in feedparser.parse(rss_provider["feed_url"]).entries]
 
     # Reuters
+    # rss_provider = {
+    #    "feed_provider": "Reuters",
+    #    "feed_name": "World",
+    #    "feed_url": "http://feeds.reuters.com/Reuters/worldNews"
+    #}
+    #rss_entries  = [{**rss_provider, **entry} for entry in feedparser.parse(rss_provider["feed_url"]).entries]
+    
+    # Aljazeera
     rss_provider = {
-        "feed_provider": "Reuters",
+	"feed_provider": "Aljazeera",
         "feed_name": "World",
-        "feed_url": "http://feeds.reuters.com/Reuters/worldNews"
+	"feed_url" : "https://www.aljazeera.com/xml/rss/all.xml"
     }
     rss_entries += [{**rss_provider, **entry} for entry in feedparser.parse(rss_provider["feed_url"]).entries]
 
+    # Washington Post
+    rss_provider = {
+	"feed_provider": "Washington Post",
+	"feed_name": "World",
+    	"feed_url" : "http://feeds.washingtonpost.com/rss/world"
+    }
+#    rss_entries  = [{**rss_provider, **entry} for entry in feedparser.parse(rss_provider["feed_url"]).entries]
+    
     # LA Times
     rss_provider = {
         "feed_provider": "Los Angeles Times",
@@ -174,7 +191,7 @@ def read_recent_rss_feeds():
     }
     rss_entries += [{**rss_provider, **entry} for entry in feedparser.parse(rss_provider["feed_url"]).entries]
     
-    now_minus_24 = datetime.now(pytz.utc) - timedelta(hours=24)
+    now_minus_24 = datetime.now(pytz.utc) - timedelta(hours=24*7)
     rss_entries_last_24h = [entry for entry in rss_entries if parse(entry["published"]) >= now_minus_24]
     return rss_entries_last_24h
 
@@ -233,9 +250,11 @@ def ts():
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
 print(ts(), "loading NLP model")
-nlp = spacy.load("en_core_web_lg")
+nlp = spacy.load("en_core_web_sm")
 s = shelve.open('processed_article_md5s.db', writeback=True)
-s["md5s"] = {}
+if not "md5s" in s:
+    print("no entries / database does not exist")
+    s["md5s"] = {}
 
 CLOUDFLARE_BEARER_TOKEN = os.environ['CLOUDFLARE_BEARER_TOKEN']
 HERE_API_KEY = os.environ['HERE_API_KEY']
@@ -245,11 +264,15 @@ while True:
     print(ts(), "Parsing new entries")
     try:
         rss_entries = read_recent_rss_feeds()
+        print(ts(), "Items:", len(rss_entries))
         new_parsed_entries_json = parse_entries(rss_entries)
 
         if len(new_parsed_entries_json) > 0:
+            print(ts(), "uplading new entries to KV")
             upload(new_parsed_entries_json)
-    except:
+    except Exception as e:
+        print("error:")
+        print(e)
         print(ts(), "An error occured")
         
     print(ts(), "Waiting", 5*60, "seconds")
