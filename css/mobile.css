@@ -319,8 +319,13 @@ body {
     width: 100%;
     bottom: 0;
     will-change: transform;
+    display: none;
 }
 
 .headline.smooth {
     transition: 0.5s ease-in-out;
+    display: block;
+}
+.headline.transaction {
+    display: block;
 }

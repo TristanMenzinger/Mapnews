@@ -1,6 +1,7 @@
 // let _DEV = "?dev_remote=true";
 // let _DEV = "?dev_iphone=true";
-let _DEV = "";
+let _DEV = "?dev_local=true";
+// let _DEV = "";
 
 // Global variables for Pagination (Desktop only)
 // The current page we're one
@@ -102,7 +103,7 @@ let init = async (is_mobile) => {
         if (Object.keys(DATE_THRESHOLDS).includes(time_preference))
             apply_timefilter(time_preference)
         else
-            apply_timefilter("all");
+            apply_timefilter("4hrs");
     }
 
 
@@ -638,16 +639,26 @@ class Headline {
 
     set_out_of_view() {
         this._move(screen.width, false);
+        this._set_in_transaction(false);
     }
 
     center(smooth = true, show_markers = true) {
 
-        if (this.next)
+        if (this.next) {
             this.next._move(screen.width, smooth);
+            this.next._set_in_transaction(true);
+            if(this.next.next)
+                this.next.next._set_in_transaction(false);
+        }
 
-        if (this.previous)
+        if (this.previous) {
             this.previous._move(-screen.width, smooth);
+            this.previous._set_in_transaction(true);
+            if(this.previous.previous)
+                this.previous.previous._set_in_transaction(false);
+        }
 
+        this._set_in_transaction(true);
         this._move(0, smooth);
 
         setTimeout(() => {
@@ -674,6 +685,13 @@ class Headline {
             this.div.classList.remove("smooth");
 
         this.div.style.transform = `translateX(${x}px)`;
+    }
+
+    _set_in_transaction(bool) {
+        if (bool)
+            this.div.classList.add("transaction");
+        else
+            this.div.classList.remove("transaction");
     }
 
     _set_smooth(bool) {
@@ -976,7 +994,7 @@ let report_ref = () => {
 // @return  {dom element}                               The dom element
 let fill_nothing_found_template = (nothing_found_message) => {
     let template = `
-    <div class="headline">
+    <div class="headline transaction">
         <div class="card shadow-sm headline-card">
             <div class="card-body headline-card-body">
                 <div class="headline-title">
