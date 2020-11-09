@@ -1,7 +1,7 @@
 // let _DEV = "?dev_remote=true";
 // let _DEV = "?dev_iphone=true";
-let _DEV = "?dev_local=true";
-// let _DEV = "";
+// let _DEV = "?dev_local=true";
+let _DEV = "";
 
 // Global variables for Pagination (Desktop only)
 // The current page we're one

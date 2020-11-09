@@ -5,6 +5,11 @@
 /*-------------------------------------------------*/
 /*SPECIFIC TO NON-MOBILE*/
 /*-------------------------------------------------*/
+
+#pagination-div {
+    flex-wrap: wrap;
+}
+
 .headline-content {
     font-size: 10pt;
     overflow: hidden !important;
@@ -169,6 +174,17 @@ body {
 /*>>> PAGE PICKER*/
 .page-link {
     height: 2.2em;
+    padding: 0 !important;
+    padding-top: 0.5rem !important;
+    text-align: center;
+}
+
+.page-item {
+    width: 25px;
+}
+
+.page-prev, .page-next {
+    width: 35px;
 }
 
 .page-item .selected {
@@ -197,7 +213,7 @@ body {
 
     .page-link {
         line-height: 9pt;
-        font-size: 10pt;
+        font-size: 8pt;
     }
 
     .page-link i {
@@ -210,6 +226,10 @@ body {
     #bar-left {
         flex-basis: 22em;
         max-width: 22em;
+    }
+    .page-link {
+        line-height: 9pt;
+        font-size: 10pt;
     }
 }
 
