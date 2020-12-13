@@ -1,5 +1,0 @@
-spacy
-newspaper3k
-cloudflare
-feedparser
-pytz
