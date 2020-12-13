@@ -1,9 +1,0 @@
-version: '3.3'
-
-services:
-  updater:
-    build: /.
-    hostname: updater
-    env_file:
-      - ./environment.txt
-    restart: unless-stopped
