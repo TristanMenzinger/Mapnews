@@ -37,6 +37,17 @@ def get_article(url):
     article.parse()
     return article
 
+
+def filter_locations(locations, filter=[]):
+    filtered_locations = []
+    for loc in locations:
+        if loc.lower() in filter and filter[loc.lower()]:
+            filtered_locations.append(filter[loc.lower()])
+        elif loc.lower() not in filter:
+            filtered_locations.append(loc)
+
+    return filtered_locations
+
 def geolocate(location_query):
     api_url = "https://geocoder.ls.hereapi.com/search/6.2/geocode.json?languages=en-US"
     params = {
@@ -195,7 +206,7 @@ def read_recent_rss_feeds():
     rss_entries_last_24h = [entry for entry in rss_entries if parse(entry["published"]) >= now_minus_24]
     return rss_entries_last_24h
 
-def parse_entries(rss_entries_last_24h):
+def parse_entries(rss_entries_last_24h, location_filter):
     VERBOSE = True
 
     top_news = []
@@ -228,6 +239,7 @@ def parse_entries(rss_entries_last_24h):
         article = get_article(entry["link"])
         # Get the locations
         locations = title_case(get_locations(article.text))
+        locations = filter_locations(locations, location_filter)
 
         locations_w_count = Counter(locations)
         locations_w_count = [{ "name": a,  "count": locations_w_count[a] } for a in locations_w_count]
@@ -257,15 +269,21 @@ if not "md5s" in s:
     s["md5s"] = {}
 
 CLOUDFLARE_BEARER_TOKEN = os.environ['CLOUDFLARE_BEARER_TOKEN']
-HERE_API_KEY = os.environ['HERE_API_KEY']
+HERE_API_KEY = os.environ['HERE_API_KEY'] 
+
+f = open("location_filter.json")
+LOCATION_FILTER = json.loads(f.read())
+f.close()
+
+print("FILTER LIST:");
+print(LOCATION_FILTER);
 
 while True:
-    
     print(ts(), "Parsing new entries")
     try:
         rss_entries = read_recent_rss_feeds()
         print(ts(), "Items:", len(rss_entries))
-        new_parsed_entries_json = parse_entries(rss_entries)
+        new_parsed_entries_json = parse_entries(rss_entries, LOCATION_FILTER)
 
         if len(new_parsed_entries_json) > 0:
             print(ts(), "uplading new entries to KV")
